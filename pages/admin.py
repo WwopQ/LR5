@@ -42,10 +42,11 @@ class CompanyHistoryAdmin(admin.ModelAdmin):
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'position', 'phone', 'email', 'order')
+    list_display = ('full_name', 'position', 'phone', 'email', 'birth_date', 'age_display', 'order')
     list_editable = ('order',)
     search_fields = ('last_name', 'first_name', 'position', 'email')
     ordering = ('order', 'last_name')
+    readonly_fields = ('age_display',)
     fieldsets = (
         ('ФИО', {
             'fields': ('last_name', 'first_name', 'patronymic'),
@@ -56,7 +57,16 @@ class EmployeeAdmin(admin.ModelAdmin):
         ('Контакты', {
             'fields': ('phone', 'email'),
         }),
+        ('Личные данные (18+)', {
+            'fields': ('birth_date', 'age_display'),
+        }),
         ('Отображение', {
             'fields': ('order',),
         }),
     )
+
+    @admin.display(description='Возраст')
+    def age_display(self, obj):
+        if obj.age is not None:
+            return f'{obj.age} лет'
+        return '—'

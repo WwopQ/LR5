@@ -62,6 +62,21 @@
 
 <!-- ═══ ФУТЕР ════════════════════════════════════════════════════════════════ -->
 <footer>
+  <div class="footer-datetime">
+    <span>
+      🕐 Местное время ({{ user_timezone }}):
+      <strong>{{ current_datetime_local|date:"d/m/Y H:i" }}</strong>
+    </span>
+    &nbsp;|&nbsp;
+    <span>
+      🌍 UTC: <strong>{{ current_datetime_utc|date:"d/m/Y H:i" }}</strong>
+    </span>
+    &nbsp;|&nbsp;
+    <details style="display:inline;">
+      <summary style="cursor:pointer;">📅 Календарь</summary>
+      <pre style="font-size:0.85rem; margin-top:0.5rem;">{{ calendar_text }}</pre>
+    </details>
+  </div>
   <p>
     &copy; {% now "Y" %} RentCar |
     <a href="{% url 'pages:privacy' %}">Политика конфиденциальности</a>

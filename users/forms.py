@@ -4,41 +4,71 @@ from django.contrib.auth.models import User
 
 from .models import Profile, validate_phone, validate_age
 
+# Regex для HTML5 pattern (клиентская валидация телефона)
+PHONE_PATTERN = r'\+375 \((29|33|44|25)\) \d{3}-\d{2}-\d{2}'
+
 
 class RegistrationForm(UserCreationForm):
-    """Форма регистрации: стандартные поля User + поля Profile."""
+    """
+    Форма регистрации: стандартные поля User + поля Profile.
+    Валидация: серверная (validators) + клиентская (HTML5 pattern/required/min).
+    """
 
     first_name = forms.CharField(
         max_length=150,
         label='Имя',
-        widget=forms.TextInput(attrs={'placeholder': 'Иван'}),
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Иван',
+            'required': True,
+            'minlength': '2',
+        }),
     )
     last_name = forms.CharField(
         max_length=150,
         label='Фамилия',
-        widget=forms.TextInput(attrs={'placeholder': 'Иванов'}),
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Иванов',
+            'required': True,
+            'minlength': '2',
+        }),
     )
     email = forms.EmailField(
         label='Email',
-        widget=forms.EmailInput(attrs={'placeholder': 'example@mail.com'}),
+        widget=forms.EmailInput(attrs={
+            'placeholder': 'example@mail.com',
+            'required': True,
+        }),
     )
     phone = forms.CharField(
         max_length=20,
         label='Телефон',
         validators=[validate_phone],
-        widget=forms.TextInput(attrs={'placeholder': '+375 (29) XXX-XX-XX'}),
+        widget=forms.TextInput(attrs={
+            'placeholder': '+375 (29) XXX-XX-XX',
+            'required': True,
+            # HTML5 pattern для клиентской валидации формата телефона
+            'pattern': PHONE_PATTERN,
+            'title': 'Формат: +375 (29) XXX-XX-XX. Коды: 29, 33, 44, 25',
+        }),
     )
     birth_date = forms.DateField(
         label='Дата рождения',
         validators=[validate_age],
-        widget=forms.DateInput(attrs={'type': 'date'}),
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+            'required': True,
+            # max — дата 18 лет назад (клиентская проверка возраста)
+            'max': '',  # заполняется в __init__
+        }),
         input_formats=['%Y-%m-%d', '%d.%m.%Y'],
     )
     address = forms.CharField(
         max_length=300,
         required=False,
         label='Адрес',
-        widget=forms.TextInput(attrs={'placeholder': 'г. Минск, ул. Ленина, д. 1'}),
+        widget=forms.TextInput(attrs={
+            'placeholder': 'г. Минск, ул. Ленина, д. 1',
+        }),
     )
 
     class Meta:
@@ -47,6 +77,18 @@ class RegistrationForm(UserCreationForm):
             'username', 'first_name', 'last_name',
             'email', 'password1', 'password2',
         )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Клиентская проверка возраста: max = сегодня − 18 лет
+        from datetime import date
+        from dateutil.relativedelta import relativedelta
+        max_date = date.today() - relativedelta(years=18)
+        self.fields['birth_date'].widget.attrs['max'] = max_date.strftime('%Y-%m-%d')
+        # password поля тоже делаем required
+        self.fields['password1'].widget.attrs['required'] = True
+        self.fields['password2'].widget.attrs['required'] = True
+        self.fields['username'].widget.attrs['required'] = True
 
     def clean_email(self):
         email = self.cleaned_data['email']
@@ -73,16 +115,30 @@ class RegistrationForm(UserCreationForm):
 class ProfileForm(forms.ModelForm):
     """Форма редактирования профиля (имя/фамилия + данные Profile)."""
 
-    first_name = forms.CharField(max_length=150, label='Имя')
-    last_name = forms.CharField(max_length=150, label='Фамилия')
-    email = forms.EmailField(label='Email')
+    first_name = forms.CharField(
+        max_length=150, label='Имя',
+        widget=forms.TextInput(attrs={'required': True, 'minlength': '2'}),
+    )
+    last_name = forms.CharField(
+        max_length=150, label='Фамилия',
+        widget=forms.TextInput(attrs={'required': True, 'minlength': '2'}),
+    )
+    email = forms.EmailField(
+        label='Email',
+        widget=forms.EmailInput(attrs={'required': True}),
+    )
 
     class Meta:
         model = Profile
         fields = ('phone', 'birth_date', 'address')
         widgets = {
-            'birth_date': forms.DateInput(attrs={'type': 'date'}),
-            'phone': forms.TextInput(attrs={'placeholder': '+375 (29) XXX-XX-XX'}),
+            'birth_date': forms.DateInput(attrs={'type': 'date', 'required': True}),
+            'phone': forms.TextInput(attrs={
+                'placeholder': '+375 (29) XXX-XX-XX',
+                'required': True,
+                'pattern': PHONE_PATTERN,
+                'title': 'Формат: +375 (29) XXX-XX-XX. Коды: 29, 33, 44, 25',
+            }),
         }
 
     def __init__(self, *args, user=None, **kwargs):
@@ -91,13 +147,20 @@ class ProfileForm(forms.ModelForm):
             self.fields['first_name'].initial = user.first_name
             self.fields['last_name'].initial = user.last_name
             self.fields['email'].initial = user.email
+        # Ограничение даты рождения (18+) на клиенте
+        from datetime import date
+        try:
+            from dateutil.relativedelta import relativedelta
+            max_date = date.today() - relativedelta(years=18)
+            self.fields['birth_date'].widget.attrs['max'] = max_date.strftime('%Y-%m-%d')
+        except ImportError:
+            pass
         # Упорядочиваем поля
         field_order = ['first_name', 'last_name', 'email', 'phone', 'birth_date', 'address']
         self.fields = {k: self.fields[k] for k in field_order if k in self.fields}
 
     def clean_email(self):
         email = self.cleaned_data['email']
-        # Проверяем уникальность, исключая текущего пользователя
         qs = User.objects.filter(email=email)
         if self.instance and self.instance.user_id:
             qs = qs.exclude(pk=self.instance.user_id)

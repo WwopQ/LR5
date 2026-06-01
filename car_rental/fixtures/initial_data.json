@@ -1,0 +1,43 @@
+[
+  {"model": "car_rental.bodytype", "pk": 1, "fields": {"name": "Седан"}},
+  {"model": "car_rental.bodytype", "pk": 2, "fields": {"name": "Кроссовер"}},
+  {"model": "car_rental.bodytype", "pk": 3, "fields": {"name": "Минивэн"}},
+  {"model": "car_rental.bodytype", "pk": 4, "fields": {"name": "Хэтчбек"}},
+  {"model": "car_rental.bodytype", "pk": 5, "fields": {"name": "Универсал"}},
+
+  {"model": "car_rental.carmodel", "pk": 1,  "fields": {"brand": "Toyota",     "model_name": "Camry",    "body_type": 1}},
+  {"model": "car_rental.carmodel", "pk": 2,  "fields": {"brand": "Toyota",     "model_name": "RAV4",     "body_type": 2}},
+  {"model": "car_rental.carmodel", "pk": 3,  "fields": {"brand": "Volkswagen", "model_name": "Passat",   "body_type": 1}},
+  {"model": "car_rental.carmodel", "pk": 4,  "fields": {"brand": "Volkswagen", "model_name": "Tiguan",   "body_type": 2}},
+  {"model": "car_rental.carmodel", "pk": 5,  "fields": {"brand": "BMW",        "model_name": "320i",     "body_type": 1}},
+  {"model": "car_rental.carmodel", "pk": 6,  "fields": {"brand": "BMW",        "model_name": "X5",       "body_type": 2}},
+  {"model": "car_rental.carmodel", "pk": 7,  "fields": {"brand": "Mercedes",   "model_name": "E-Class",  "body_type": 1}},
+  {"model": "car_rental.carmodel", "pk": 8,  "fields": {"brand": "Kia",        "model_name": "Sportage", "body_type": 2}},
+  {"model": "car_rental.carmodel", "pk": 9,  "fields": {"brand": "Hyundai",    "model_name": "Sonata",   "body_type": 1}},
+  {"model": "car_rental.carmodel", "pk": 10, "fields": {"brand": "Skoda",      "model_name": "Octavia",  "body_type": 5}},
+
+  {"model": "car_rental.carpark", "pk": 1, "fields": {"name": "Центральный",  "address": "г. Минск, ул. Ленина, 10"}},
+  {"model": "car_rental.carpark", "pk": 2, "fields": {"name": "Северный",     "address": "г. Минск, пр. Независимости, 150"}},
+
+  {"model": "car_rental.car", "pk": 1,  "fields": {"license_plate": "1234 АВ-7", "car_model": 1,  "car_park": 1, "year": 2022, "car_value": "45000.00", "daily_price": "120.00"}},
+  {"model": "car_rental.car", "pk": 2,  "fields": {"license_plate": "5678 СД-7", "car_model": 2,  "car_park": 1, "year": 2023, "car_value": "65000.00", "daily_price": "160.00"}},
+  {"model": "car_rental.car", "pk": 3,  "fields": {"license_plate": "9012 ЕЖ-7", "car_model": 3,  "car_park": 2, "year": 2021, "car_value": "40000.00", "daily_price": "100.00"}},
+  {"model": "car_rental.car", "pk": 4,  "fields": {"license_plate": "3456 ЗИ-7", "car_model": 4,  "car_park": 2, "year": 2022, "car_value": "58000.00", "daily_price": "150.00"}},
+  {"model": "car_rental.car", "pk": 5,  "fields": {"license_plate": "7890 КЛ-7", "car_model": 5,  "car_park": 1, "year": 2023, "car_value": "75000.00", "daily_price": "200.00"}},
+  {"model": "car_rental.car", "pk": 6,  "fields": {"license_plate": "2345 МН-7", "car_model": 6,  "car_park": 1, "year": 2022, "car_value": "110000.00","daily_price": "280.00"}},
+  {"model": "car_rental.car", "pk": 7,  "fields": {"license_plate": "6789 ОП-7", "car_model": 7,  "car_park": 2, "year": 2021, "car_value": "90000.00", "daily_price": "250.00"}},
+  {"model": "car_rental.car", "pk": 8,  "fields": {"license_plate": "0123 РС-7", "car_model": 8,  "car_park": 1, "year": 2023, "car_value": "55000.00", "daily_price": "140.00"}},
+  {"model": "car_rental.car", "pk": 9,  "fields": {"license_plate": "4567 ТУ-7", "car_model": 9,  "car_park": 2, "year": 2022, "car_value": "42000.00", "daily_price": "110.00"}},
+  {"model": "car_rental.car", "pk": 10, "fields": {"license_plate": "8901 ФХ-7", "car_model": 10, "car_park": 2, "year": 2021, "car_value": "38000.00", "daily_price": "90.00"}},
+  {"model": "car_rental.car", "pk": 11, "fields": {"license_plate": "2468 ЦЧ-7", "car_model": 1,  "car_park": 1, "year": 2020, "car_value": "35000.00", "daily_price": "95.00"}},
+  {"model": "car_rental.car", "pk": 12, "fields": {"license_plate": "1357 ШЩ-7", "car_model": 3,  "car_park": 2, "year": 2023, "car_value": "44000.00", "daily_price": "115.00"}},
+
+  {"model": "car_rental.discount", "pk": 1, "fields": {"name": "Постоянный клиент", "percentage": "10.00"}},
+  {"model": "car_rental.discount", "pk": 2, "fields": {"name": "Длительный прокат (7+ дней)", "percentage": "15.00"}},
+  {"model": "car_rental.discount", "pk": 3, "fields": {"name": "Сезонная скидка", "percentage": "5.00"}},
+
+  {"model": "car_rental.fine", "pk": 1, "fields": {"name": "Возврат с загрязнением", "amount": "50.00"}},
+  {"model": "car_rental.fine", "pk": 2, "fields": {"name": "Несвоевременный возврат (сутки)", "amount": "200.00"}},
+  {"model": "car_rental.fine", "pk": 3, "fields": {"name": "Повреждение кузова", "amount": "500.00"}},
+  {"model": "car_rental.fine", "pk": 4, "fields": {"name": "Заправка не тем топливом", "amount": "300.00"}}
+]

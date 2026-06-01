@@ -1,9 +1,30 @@
 import logging
+import re
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
+
+PHONE_REGEX = re.compile(r'^\+375 \((29|33|44|25)\) \d{3}-\d{2}-\d{2}$')
+
+
+def validate_phone_employee(value):
+    if value and not PHONE_REGEX.match(value):
+        raise ValidationError(
+            'Введите номер в формате +375 (29) XXX-XX-XX. Коды: 29, 33, 44, 25.'
+        )
+
+
+def validate_age_18(value):
+    """Сотрудник должен быть старше 18 лет."""
+    today = timezone.now().date()
+    age = (today - value).days // 365
+    if age < 18:
+        raise ValidationError(
+            f'Возраст сотрудника должен быть не менее 18 лет. Текущий возраст: {age} лет.'
+        )
 
 
 class CompanyInfo(models.Model):
@@ -63,6 +84,7 @@ class CompanyHistory(models.Model):
 class Employee(models.Model):
     """
     Сотрудник компании (страница «Контакты»).
+    Возрастное ограничение 18+ (как для клиентов).
     """
     photo = models.ImageField(
         upload_to='employees/', blank=True, null=True, verbose_name='Фото'
@@ -72,8 +94,19 @@ class Employee(models.Model):
     patronymic = models.CharField(max_length=100, blank=True, verbose_name='Отчество')
     position = models.CharField(max_length=200, verbose_name='Должность')
     description = models.TextField(blank=True, verbose_name='Описание работ')
-    phone = models.CharField(max_length=20, blank=True, verbose_name='Телефон')
+    phone = models.CharField(
+        max_length=20, blank=True,
+        validators=[validate_phone_employee],
+        verbose_name='Телефон',
+        help_text='+375 (29) XXX-XX-XX',
+    )
     email = models.EmailField(blank=True, verbose_name='Email')
+    birth_date = models.DateField(
+        null=True, blank=True,
+        validators=[validate_age_18],
+        verbose_name='Дата рождения',
+        help_text='Только для лиц старше 18 лет',
+    )
     order = models.PositiveSmallIntegerField(
         default=0,
         verbose_name='Порядок отображения',
@@ -94,3 +127,10 @@ class Employee(models.Model):
         if self.patronymic:
             parts.append(self.patronymic)
         return ' '.join(parts)
+
+    @property
+    def age(self):
+        if not self.birth_date:
+            return None
+        today = timezone.now().date()
+        return (today - self.birth_date).days // 365
