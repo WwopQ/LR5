@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Промокоды и купоны — RentCar{% endblock %}
+
+{% block content %}
+<h1>Промокоды и купоны</h1>
+
+{# ─── Действующие ──────────────────────────────────────────────────────── #}
+<section>
+  <h2>Действующие</h2>
+
+  {% if active_promos %}
+    <table class="promo-table">
+      <thead>
+        <tr>
+          <th>Промокод</th>
+          <th>Скидка</th>
+          <th>Описание</th>
+          <th>Действует до</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for promo in active_promos %}
+          <tr>
+            <td><code>{{ promo.code }}</code></td>
+            <td>{{ promo.discount_pct }}%</td>
+            <td>{{ promo.description|default:"—" }}</td>
+            <td>{{ promo.valid_to|date:"d.m.Y" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Активных промокодов нет.</p>
+  {% endif %}
+</section>
+
+{# ─── Архив ────────────────────────────────────────────────────────────── #}
+{% if archived_promos %}
+  <section>
+    <h2>Архив</h2>
+    <table class="promo-table promo-table--archived">
+      <thead>
+        <tr>
+          <th>Промокод</th>
+          <th>Скидка</th>
+          <th>Описание</th>
+          <th>Действовал до</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for promo in archived_promos %}
+          <tr>
+            <td><code>{{ promo.code }}</code></td>
+            <td>{{ promo.discount_pct }}%</td>
+            <td>{{ promo.description|default:"—" }}</td>
+            <td>{{ promo.valid_to|date:"d.m.Y" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+{% endif %}
+
+{% endblock %}

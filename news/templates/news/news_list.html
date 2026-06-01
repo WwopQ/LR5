@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Новости — RentCar{% endblock %}
+
+{% block content %}
+<h1>Новости</h1>
+
+{% if articles %}
+  <div class="article-list">
+    {% for article in articles %}
+      <article class="article-card">
+        {% if article.image %}
+          <a href="{% url 'news:detail' article.pk %}">
+            <img src="{{ article.image.url }}" alt="{{ article.title }}">
+          </a>
+        {% endif %}
+
+        <div class="article-card__body">
+          <h2>
+            <a href="{% url 'news:detail' article.pk %}">{{ article.title }}</a>
+          </h2>
+
+          <p class="article-card__meta">
+            {{ article.published_at|date:"d.m.Y" }}
+          </p>
+
+          <p>{{ article.summary }}</p>
+
+          <a href="{% url 'news:detail' article.pk %}">Читать далее →</a>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+
+  {# ─── Пагинация ─────────────────────────────────────────────────── #}
+  {% if is_paginated %}
+    <nav class="pagination">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">← Назад</a>
+      {% endif %}
+
+      <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Вперёд →</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+
+{% else %}
+  <p>Новостей пока нет.</p>
+{% endif %}
+{% endblock %}

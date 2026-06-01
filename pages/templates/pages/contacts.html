@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Контакты — RentCar{% endblock %}
+
+{% block content %}
+<h1>Контакты</h1>
+
+{% if employees %}
+  <div class="employees">
+    {% for emp in employees %}
+      <div class="employee-card">
+        {% if emp.photo %}
+          <img src="{{ emp.photo.url }}" alt="{{ emp.full_name }}">
+        {% else %}
+          <div class="employee-card__no-photo">Фото отсутствует</div>
+        {% endif %}
+
+        <h3>{{ emp.full_name }}</h3>
+        <p class="position">{{ emp.position }}</p>
+
+        {% if emp.description %}
+          <p>{{ emp.description }}</p>
+        {% endif %}
+
+        {% if emp.phone %}
+          <p>Тел.: <a href="tel:{{ emp.phone }}">{{ emp.phone }}</a></p>
+        {% endif %}
+
+        {% if emp.email %}
+          <p>Email: <a href="mailto:{{ emp.email }}">{{ emp.email }}</a></p>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>Информация о сотрудниках ещё не добавлена.</p>
+{% endif %}
+{% endblock %}

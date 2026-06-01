@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Мои прокаты — RentCar{% endblock %}
+
+{% block content %}
+<h1>Мои прокаты</h1>
+
+{% if rentals %}
+  <table class="rentals-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Автомобиль</th>
+        <th>Дата выдачи</th>
+        <th>Дней</th>
+        <th>Возврат</th>
+        <th>Скидка</th>
+        <th>Сумма проката</th>
+        <th>Скидка (руб.)</th>
+        <th>Штрафы (руб.)</th>
+        <th>Итого</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for rental in rentals %}
+        <tr>
+          <td>{{ rental.pk }}</td>
+          <td>{{ rental.car.car_model }} ({{ rental.car.license_plate }})</td>
+          <td>{{ rental.issue_date|date:"d.m.Y" }}</td>
+          <td>{{ rental.days_count }}</td>
+          <td>{{ rental.expected_return_date|date:"d.m.Y" }}</td>
+          <td>{{ rental.discount|default:"—" }}</td>
+          <td>{{ rental.rental_sum }} руб.</td>
+          <td>{{ rental.discount_sum }} руб.</td>
+          <td>
+            {% if rental.fine_sum %}
+              <span style="color:red">{{ rental.fine_sum }} руб.</span>
+              <small>
+                ({% for fine in rental.fines.all %}{{ fine.name }}{% if not forloop.last %}, {% endif %}{% endfor %})
+              </small>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td><strong>{{ rental.total_sum }} руб.</strong></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>У вас пока нет прокатов. <a href="{% url 'car_rental:car_list' %}">Выбрать автомобиль</a></p>
+{% endif %}
+{% endblock %}

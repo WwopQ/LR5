@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} — RentCar{% endblock %}
+
+{% block content %}
+<article class="article-detail">
+
+  <h1>{{ article.title }}</h1>
+
+  <p class="article-detail__meta">
+    Опубликовано: {{ article.published_at|date:"d.m.Y H:i" }}
+    {% if request.user.is_staff and not article.is_published %}
+      <strong style="color:red;">[Не опубликовано — видно только сотрудникам]</strong>
+    {% endif %}
+  </p>
+
+  {% if article.image %}
+    <figure>
+      <img src="{{ article.image.url }}" alt="{{ article.title }}">
+    </figure>
+  {% endif %}
+
+  <div class="article-detail__content">
+    {{ article.content|linebreaks }}
+  </div>
+
+  <p class="article-detail__updated">
+    Обновлено: {{ article.updated_at|date:"d.m.Y H:i" }}
+  </p>
+
+  <a href="{% url 'news:list' %}">← Все новости</a>
+
+</article>
+{% endblock %}

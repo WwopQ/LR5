@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Личный кабинет — RentCar{% endblock %}
+
+{% block content %}
+<h1>Личный кабинет</h1>
+
+<p>
+  <strong>{{ user.get_full_name|default:user.username }}</strong>
+  &nbsp;|&nbsp; Возраст: {{ profile.age }} лет
+  &nbsp;|&nbsp; На сайте с: {{ user.date_joined|date:"d.m.Y" }}
+</p>
+
+<h2>Редактировать профиль</h2>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+    <div class="form-errors">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  {% for field in form %}
+    <div class="form-group">
+      <label for="{{ field.id_for_label }}">
+        {{ field.label }}{% if field.field.required %} <span class="required">*</span>{% endif %}
+      </label>
+      {{ field }}
+      {% if field.help_text %}
+        <small class="form-help">{{ field.help_text }}</small>
+      {% endif %}
+      {% if field.errors %}
+        <span class="form-error">{{ field.errors }}</span>
+      {% endif %}
+    </div>
+  {% endfor %}
+
+  <button type="submit">Сохранить</button>
+</form>
+
+<hr>
+
+{# Кнопка выхода через POST (защита от CSRF) #}
+<form method="post" action="{% url 'users:logout' %}">
+  {% csrf_token %}
+  <button type="submit">Выйти из аккаунта</button>
+</form>
+{% endblock %}

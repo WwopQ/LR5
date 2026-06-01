@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Статистика — RentCar{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<h1>Статистика и аналитика</h1>
+
+{% if stats.total_count == 0 %}
+  <p>Данных для статистики нет. Добавьте прокаты через <a href="{% url 'admin:index' %}">админ-панель</a>.</p>
+{% else %}
+
+{# ─── Общие показатели ────────────────────────────────────────────────── #}
+<section>
+  <h2>Общие показатели</h2>
+  <table class="stats-table">
+    <tr><th>Всего прокатов</th><td>{{ stats.total_count }}</td></tr>
+    <tr><th>Общая выручка</th><td>{{ stats.total_revenue }} руб.</td></tr>
+    <tr><th>Средняя сумма проката</th><td>{{ stats.avg_total }} руб.</td></tr>
+    <tr><th>Медиана суммы проката</th><td>{{ stats.median_sum }} руб.</td></tr>
+    <tr><th>Мода суммы проката</th><td>{{ stats.mode_sum }} руб.</td></tr>
+    <tr><th>Максимальный прокат</th><td>{{ stats.max_total }} руб.</td></tr>
+    <tr><th>Минимальный прокат</th><td>{{ stats.min_total }} руб.</td></tr>
+  </table>
+</section>
+
+{# ─── Возраст клиентов ────────────────────────────────────────────────── #}
+<section>
+  <h2>Возраст клиентов</h2>
+  <table class="stats-table">
+    <tr><th>Средний возраст</th><td>{{ stats.avg_age }} лет</td></tr>
+    <tr><th>Медианный возраст</th><td>{{ stats.median_age }} лет</td></tr>
+  </table>
+</section>
+
+{# ─── Популярные марки ────────────────────────────────────────────────── #}
+<section>
+  <h2>Популярные марки (по количеству прокатов)</h2>
+  <table class="stats-table">
+    <thead><tr><th>Марка</th><th>Количество прокатов</th></tr></thead>
+    <tbody>
+      {% for brand in stats.popular_brands %}
+        <tr>
+          <td>{{ brand.car__car_model__brand }}</td>
+          <td>{{ brand.count }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+{# ─── Типы кузова ─────────────────────────────────────────────────────── #}
+<section>
+  <h2>Типы кузова</h2>
+  <table class="stats-table">
+    <thead><tr><th>Тип кузова</th><th>Прокатов</th><th>Выручка</th></tr></thead>
+    <tbody>
+      {% for bt in stats.popular_body_types %}
+        <tr>
+          <td>{{ bt.car__car_model__body_type__name }}</td>
+          <td>{{ bt.count }}</td>
+          <td>{{ bt.revenue }} руб.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+{# ─── Клиенты по алфавиту ─────────────────────────────────────────────── #}
+<section>
+  <h2>Клиенты (по алфавиту)</h2>
+  <table class="stats-table">
+    <thead>
+      <tr><th>Клиент</th><th>Прокатов</th><th>Потрачено</th></tr>
+    </thead>
+    <tbody>
+      {% for client in stats.clients_alpha %}
+        <tr>
+          <td>{{ client.full_name }}</td>
+          <td>{{ client.rental_count }}</td>
+          <td>{{ client.total_spent|default:"0" }} руб.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+{# ─── График выручки по месяцам ───────────────────────────────────────── #}
+{% if stats.chart_labels %}
+<section>
+  <h2>Выручка по месяцам</h2>
+  <canvas id="revenueChart" height="100"></canvas>
+</section>
+{% endif %}
+
+{% endif %}{# end if stats.total_count #}
+
+{# ─── Внешние API ─────────────────────────────────────────────────────── #}
+<section>
+  <h2>Данные из внешних сервисов</h2>
+
+  {% if random_user %}
+    <h3>Случайный пользователь (RandomUser API)</h3>
+    <p>
+      <img src="{{ random_user.picture }}" alt="Фото">
+      <strong>{{ random_user.name }}</strong> —
+      {{ random_user.email }},
+      {{ random_user.country }}
+    </p>
+  {% else %}
+    <p>RandomUser API недоступен.</p>
+  {% endif %}
+
+  {% if rates %}
+    <h3>Курсы валют к BYN (ExchangeRate API)</h3>
+    <table class="stats-table">
+      <tr><th>USD</th><td>{{ rates.USD }}</td></tr>
+      <tr><th>EUR</th><td>{{ rates.EUR }}</td></tr>
+      <tr><th>RUB</th><td>{{ rates.RUB }}</td></tr>
+    </table>
+  {% else %}
+    <p>ExchangeRate API недоступен.</p>
+  {% endif %}
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+{% if stats.chart_labels %}
+<script>
+  const ctx = document.getElementById('revenueChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: {{ stats.chart_labels|safe }},
+      datasets: [
+        {
+          label: 'Выручка (руб.)',
+          data: {{ stats.chart_revenue|safe }},
+          backgroundColor: 'rgba(54, 162, 235, 0.6)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1,
+          yAxisID: 'y',
+        },
+        {
+          label: 'Количество прокатов',
+          data: {{ stats.chart_counts|safe }},
+          type: 'line',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          yAxisID: 'y1',
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y:  { type: 'linear', position: 'left',  title: { display: true, text: 'Выручка (руб.)' } },
+        y1: { type: 'linear', position: 'right', title: { display: true, text: 'Прокатов' }, grid: { drawOnChartArea: false } },
+      },
+    },
+  });
+</script>
+{% endif %}
+{% endblock %}

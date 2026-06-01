@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Автомобили — RentCar{% endblock %}
+
+{% block content %}
+<h1>Каталог автомобилей</h1>
+
+{# ─── Поиск и сортировка ──────────────────────────────────────────────── #}
+<form method="get" action="">
+  <input type="text" name="q" value="{{ q }}" placeholder="Поиск по марке, модели, номеру...">
+  <select name="sort">
+    <option value="brand"  {% if sort == "brand"  %}selected{% endif %}>Марка (А→Я)</option>
+    <option value="-brand" {% if sort == "-brand" %}selected{% endif %}>Марка (Я→А)</option>
+    <option value="price"  {% if sort == "price"  %}selected{% endif %}>Цена (возр.)</option>
+    <option value="-price" {% if sort == "-price" %}selected{% endif %}>Цена (убыв.)</option>
+    <option value="year"   {% if sort == "year"   %}selected{% endif %}>Год (возр.)</option>
+    <option value="-year"  {% if sort == "-year"  %}selected{% endif %}>Год (убыв.)</option>
+  </select>
+  <button type="submit">Применить</button>
+  {% if q %}<a href="?">Сбросить</a>{% endif %}
+</form>
+
+{# ─── Список ──────────────────────────────────────────────────────────── #}
+{% if cars %}
+  <table class="cars-table">
+    <thead>
+      <tr>
+        <th>Марка / Модель</th>
+        <th>Госномер</th>
+        <th>Год</th>
+        <th>Тип кузова</th>
+        <th>Автопарк</th>
+        <th>Цена/сутки</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for car in cars %}
+        <tr>
+          <td><a href="{% url 'car_rental:car_detail' car.pk %}">{{ car.car_model }}</a></td>
+          <td>{{ car.license_plate }}</td>
+          <td>{{ car.year }}</td>
+          <td>{{ car.car_model.body_type }}</td>
+          <td>{{ car.car_park }}</td>
+          <td>{{ car.daily_price }} руб.</td>
+          <td>
+            {% if user.is_authenticated %}
+              <a href="{% url 'car_rental:rent_car' car.pk %}">Арендовать</a>
+            {% else %}
+              <a href="{% url 'users:login' %}?next={% url 'car_rental:rent_car' car.pk %}">Войти</a>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if is_paginated %}
+    <nav class="pagination">
+      {% if page_obj.has_previous %}
+        <a href="?q={{ q }}&sort={{ sort }}&page={{ page_obj.previous_page_number }}">← Назад</a>
+      {% endif %}
+      <span>{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a href="?q={{ q }}&sort={{ sort }}&page={{ page_obj.next_page_number }}">Вперёд →</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+
+{% else %}
+  <p>Автомобилей не найдено. <a href="?">Сбросить фильтр</a></p>
+{% endif %}
+
+{% if user.is_staff %}
+  <p><a href="{% url 'car_rental:statistics' %}">Статистика и аналитика →</a></p>
+{% endif %}
+{% endblock %}

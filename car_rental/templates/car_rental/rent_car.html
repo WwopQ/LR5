@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Оформить прокат — RentCar{% endblock %}
+
+{% block content %}
+<h1>Оформить прокат</h1>
+
+<h2>{{ car.car_model }} ({{ car.license_plate }})</h2>
+<p>Суточная стоимость: <strong>{{ car.daily_price }} руб.</strong></p>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+    <div class="form-errors">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  {# Скрытое поле car #}
+  {{ form.car }}
+
+  <div class="form-group">
+    <label for="{{ form.issue_date.id_for_label }}">{{ form.issue_date.label }}</label>
+    {{ form.issue_date }}
+    {% if form.issue_date.errors %}
+      <span class="form-error">{{ form.issue_date.errors }}</span>
+    {% endif %}
+  </div>
+
+  <div class="form-group">
+    <label for="{{ form.days_count.id_for_label }}">{{ form.days_count.label }}</label>
+    {{ form.days_count }}
+    {% if form.days_count.errors %}
+      <span class="form-error">{{ form.days_count.errors }}</span>
+    {% endif %}
+  </div>
+
+  <div class="form-group">
+    <label for="{{ form.discount.id_for_label }}">{{ form.discount.label }}</label>
+    {{ form.discount }}
+    {% if form.discount.errors %}
+      <span class="form-error">{{ form.discount.errors }}</span>
+    {% endif %}
+  </div>
+
+  <p id="price-preview"></p>
+
+  <button type="submit">Оформить прокат</button>
+  <a href="{% url 'car_rental:car_detail' car.pk %}">Отмена</a>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Предварительный расчёт стоимости на стороне клиента
+  const dailyPrice = {{ car.daily_price }};
+  const daysInput = document.getElementById('{{ form.days_count.id_for_label }}');
+  const preview = document.getElementById('price-preview');
+
+  function updatePreview() {
+    const days = parseInt(daysInput.value) || 0;
+    if (days > 0) {
+      preview.textContent = 'Примерная стоимость: ' + (dailyPrice * days).toFixed(2) + ' руб. (без учёта скидок)';
+    } else {
+      preview.textContent = '';
+    }
+  }
+  daysInput && daysInput.addEventListener('input', updatePreview);
+</script>
+{% endblock %}

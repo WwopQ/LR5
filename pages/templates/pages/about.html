@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}О компании — RentCar{% endblock %}
+
+{% block content %}
+<h1>О компании</h1>
+
+{% if company %}
+  {% if company.logo %}
+    <img src="{{ company.logo.url }}" alt="Логотип RentCar">
+  {% endif %}
+
+  <section>
+    <p>{{ company.text|linebreaks }}</p>
+  </section>
+
+  {% if company.video_url %}
+    <section>
+      <h2>Видео о нас</h2>
+      <a href="{{ company.video_url }}" target="_blank">Смотреть видео</a>
+    </section>
+  {% endif %}
+
+  {% if company.history.all %}
+    <section>
+      <h2>История компании</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Год</th>
+            <th>Событие</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for event in company.history.all %}
+            <tr>
+              <td><strong>{{ event.year }}</strong></td>
+              <td>{{ event.description }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+  {% endif %}
+
+  {% if company.requisites %}
+    <section>
+      <h2>Реквизиты</h2>
+      <pre>{{ company.requisites }}</pre>
+    </section>
+  {% endif %}
+
+{% else %}
+  <p>Информация о компании ещё не добавлена.</p>
+{% endif %}
+{% endblock %}

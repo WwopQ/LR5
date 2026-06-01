@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Главная — RentCar{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h1>Прокат автомобилей RentCar</h1>
+  <p>Широкий выбор автомобилей по доступным ценам. Быстрое оформление, прозрачные условия.</p>
+  <a href="{% url 'car_rental:car_list' %}">Выбрать автомобиль</a>
+</section>
+
+{% if latest_article %}
+<section class="latest-news">
+  <h2>Последняя новость</h2>
+  <article>
+    {% if latest_article.image %}
+      <img src="{{ latest_article.image.url }}" alt="{{ latest_article.title }}">
+    {% endif %}
+    <h3>{{ latest_article.title }}</h3>
+    <p class="date">{{ latest_article.published_at|date:"d.m.Y" }}</p>
+    <p>{{ latest_article.summary }}</p>
+    <a href="{% url 'news:detail' latest_article.pk %}">Читать далее →</a>
+  </article>
+</section>
+{% else %}
+<section class="latest-news">
+  <p>Новостей пока нет. <a href="{% url 'pages:about' %}">Узнайте о нас</a>.</p>
+</section>
+{% endif %}
+{% endblock %}

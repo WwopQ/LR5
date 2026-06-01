@@ -1,0 +1,27 @@
+# Окружение
+.env
+djvenv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# БД
+db.sqlite3
+
+# Логи
+logs/*.log
+
+# Медиа (загружаемые файлы)
+media/
+
+# Статика (collectstatic)
+staticfiles/
+
+# PyCharm
+.idea/
+
+# Тесты
+.coverage
+htmlcov/
+.pytest_cache/

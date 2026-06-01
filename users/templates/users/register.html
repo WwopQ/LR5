@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Регистрация — RentCar{% endblock %}
+
+{% block content %}
+<h1>Регистрация</h1>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+    <div class="form-errors">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  {% for field in form %}
+    <div class="form-group">
+      <label for="{{ field.id_for_label }}">
+        {{ field.label }}{% if field.field.required %} <span class="required">*</span>{% endif %}
+      </label>
+      {{ field }}
+      {% if field.help_text %}
+        <small class="form-help">{{ field.help_text }}</small>
+      {% endif %}
+      {% if field.errors %}
+        <span class="form-error">{{ field.errors }}</span>
+      {% endif %}
+    </div>
+  {% endfor %}
+
+  <button type="submit">Зарегистрироваться</button>
+  <p>Уже есть аккаунт? <a href="{% url 'users:login' %}">Войти</a></p>
+</form>
+{% endblock %}

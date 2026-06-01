@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}RentCar — Прокат автомобилей{% endblock %}</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- ═══ НАВИГАЦИЯ ════════════════════════════════════════════════════════════ -->
+<header>
+  <nav>
+    <a href="{% url 'pages:home' %}"><strong>🚗 RentCar</strong></a>
+    <ul>
+      <li><a href="{% url 'pages:home' %}">Главная</a></li>
+      <li><a href="{% url 'pages:about' %}">О компании</a></li>
+      <li><a href="{% url 'news:list' %}">Новости</a></li>
+      <li><a href="{% url 'faq:list' %}">Вопросы и ответы</a></li>
+      <li><a href="{% url 'vacancies:list' %}">Вакансии</a></li>
+      <li><a href="{% url 'reviews:list' %}">Отзывы</a></li>
+      <li><a href="{% url 'promos:list' %}">Промокоды</a></li>
+      <li><a href="{% url 'pages:contacts' %}">Контакты</a></li>
+      <li><a href="{% url 'car_rental:car_list' %}">Автомобили</a></li>
+    </ul>
+
+    <div class="nav-auth">
+      {% if user.is_authenticated %}
+        <a href="{% url 'users:profile' %}">{{ user.get_full_name|default:user.username }}</a>
+        <a href="{% url 'car_rental:my_rentals' %}">Мои прокаты</a>
+        {% if user.is_staff %}
+          <a href="{% url 'car_rental:statistics' %}">Статистика</a>
+          <a href="{% url 'admin:index' %}">Админ</a>
+        {% endif %}
+        <form method="post" action="{% url 'users:logout' %}" style="display:inline">
+          {% csrf_token %}
+          <button type="submit">Выйти</button>
+        </form>
+      {% else %}
+        <a href="{% url 'users:login' %}">Войти</a>
+        <a href="{% url 'users:register' %}">Регистрация</a>
+      {% endif %}
+    </div>
+  </nav>
+</header>
+
+<!-- ═══ СООБЩЕНИЯ (django.messages) ═════════════════════════════════════════ -->
+{% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+      <div class="message message--{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<!-- ═══ ОСНОВНОЙ КОНТЕНТ ═════════════════════════════════════════════════════ -->
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<!-- ═══ ФУТЕР ════════════════════════════════════════════════════════════════ -->
+<footer>
+  <p>
+    &copy; {% now "Y" %} RentCar |
+    <a href="{% url 'pages:privacy' %}">Политика конфиденциальности</a>
+  </p>
+</footer>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Отзывы — RentCar{% endblock %}
+
+{% block content %}
+<h1>Отзывы клиентов</h1>
+
+<p>
+  {% if user.is_authenticated %}
+    <a href="{% url 'reviews:add' %}">Оставить отзыв</a>
+  {% else %}
+    <a href="{% url 'users:login' %}?next={% url 'reviews:add' %}">Войдите</a>, чтобы оставить отзыв.
+  {% endif %}
+</p>
+
+{% if reviews %}
+  <div class="review-list">
+    {% for review in reviews %}
+      <div class="review-card">
+        <div class="review-card__header">
+          <strong>{{ review.name }}</strong>
+          <span class="review-card__rating">
+            {% for i in "12345" %}
+              {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+            {% endfor %}
+            ({{ review.rating }}/5)
+          </span>
+          <span class="review-card__date">{{ review.created_at|date:"d.m.Y" }}</span>
+        </div>
+        <p class="review-card__text">{{ review.text|linebreaks }}</p>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if is_paginated %}
+    <nav class="pagination">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">← Назад</a>
+      {% endif %}
+      <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Вперёд →</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+
+{% else %}
+  <p>Отзывов пока нет. Будьте первым!</p>
+{% endif %}
+{% endblock %}

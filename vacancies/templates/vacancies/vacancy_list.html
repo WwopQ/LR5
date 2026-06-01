@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Вакансии — RentCar{% endblock %}
+
+{% block content %}
+<h1>Вакансии</h1>
+
+{% if vacancies %}
+  <div class="vacancy-list">
+    {% for vacancy in vacancies %}
+      <div class="vacancy-card">
+        <h2>{{ vacancy.title }}</h2>
+        <p class="vacancy-card__meta">
+          Опубликовано: {{ vacancy.created_at|date:"d.m.Y" }}
+        </p>
+        <div class="vacancy-card__description">
+          {{ vacancy.description|linebreaks }}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>Открытых вакансий нет. Следите за обновлениями.</p>
+{% endif %}
+{% endblock %}

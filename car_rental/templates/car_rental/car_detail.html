@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}{{ car.car_model }} — RentCar{% endblock %}
+
+{% block content %}
+<h1>{{ car.car_model }}</h1>
+
+<table class="car-detail-table">
+  <tr><th>Государственный номер</th><td>{{ car.license_plate }}</td></tr>
+  <tr><th>Марка</th><td>{{ car.car_model.brand }}</td></tr>
+  <tr><th>Модель</th><td>{{ car.car_model.model_name }}</td></tr>
+  <tr><th>Тип кузова</th><td>{{ car.car_model.body_type }}</td></tr>
+  <tr><th>Год выпуска</th><td>{{ car.year }}</td></tr>
+  <tr><th>Автопарк</th><td>{{ car.car_park.name }}, {{ car.car_park.address }}</td></tr>
+  <tr><th>Стоимость автомобиля</th><td>{{ car.car_value }} руб.</td></tr>
+  <tr><th>Суточная стоимость проката</th><td><strong>{{ car.daily_price }} руб./сут.</strong></td></tr>
+</table>
+
+{# ─── Курсы валют ─────────────────────────────────────────────────────── #}
+{% if rates %}
+  <section>
+    <h2>Стоимость суток проката в других валютах</h2>
+    <table>
+      <tr>
+        <td>USD</td>
+        <td>{{ car.daily_price|floatformat:2 }} BYN = {{ rates.USD }} × {{ car.daily_price|floatformat:2 }}</td>
+      </tr>
+      <tr>
+        <td>EUR</td>
+        <td>{{ rates.EUR }}</td>
+      </tr>
+      <tr>
+        <td>RUB</td>
+        <td>{{ rates.RUB }}</td>
+      </tr>
+    </table>
+    <small>Курс BYN к другим валютам (ExchangeRate API)</small>
+  </section>
+{% endif %}
+
+<p>
+  {% if user.is_authenticated %}
+    <a href="{% url 'car_rental:rent_car' car.pk %}">Арендовать этот автомобиль</a>
+  {% else %}
+    <a href="{% url 'users:login' %}?next={% url 'car_rental:rent_car' car.pk %}">
+      Войдите, чтобы арендовать
+    </a>
+  {% endif %}
+  &nbsp;|&nbsp;
+  <a href="{% url 'car_rental:car_list' %}">← Все автомобили</a>
+</p>
+{% endblock %}

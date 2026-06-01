@@ -1,0 +1,18 @@
+[run]
+source = .
+omit =
+    */migrations/*
+    */djvenv/*
+    manage.py
+    rentcar/wsgi.py
+    rentcar/asgi.py
+    */staticfiles/*
+    */htmlcov/*
+    conftest.py
+
+[report]
+show_missing = true
+skip_covered = false
+
+[html]
+directory = htmlcov

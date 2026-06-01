@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Вопросы и ответы — RentCar{% endblock %}
+
+{% block content %}
+<h1>Вопросы и ответы</h1>
+
+{% if faqs %}
+  <dl class="faq-list">
+    {% for faq in faqs %}
+      <div class="faq-item">
+        <dt class="faq-item__question">{{ faq.question }}</dt>
+        <dd class="faq-item__answer">
+          {{ faq.answer|linebreaks }}
+          <span class="faq-item__date">Добавлено: {{ faq.date_added|date:"d.m.Y" }}</span>
+        </dd>
+      </div>
+    {% endfor %}
+  </dl>
+{% else %}
+  <p>Вопросов пока нет.</p>
+{% endif %}
+{% endblock %}
