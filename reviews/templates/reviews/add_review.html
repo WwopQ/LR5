@@ -1,50 +1,49 @@
 {% extends "base.html" %}
-
 {% block title %}Написать отзыв — RentCar{% endblock %}
 
 {% block content %}
-<h1>Написать отзыв</h1>
-
-<form method="post" novalidate>
-  {% csrf_token %}
-
-  {% if form.non_field_errors %}
-    <div class="form-errors">{{ form.non_field_errors }}</div>
-  {% endif %}
-
-  <div class="form-group">
-    <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
-    {{ form.name }}
-    {% if form.name.errors %}
-      <span class="form-error">{{ form.name.errors }}</span>
-    {% endif %}
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb mb-1">
+      <li class="breadcrumb-item"><a href="{% url 'reviews:list' %}">Отзывы</a></li>
+      <li class="breadcrumb-item active">Написать отзыв</li>
+    </ol></nav>
+    <h1><i class="fa-solid fa-pen-to-square me-2"></i>Написать отзыв</h1>
   </div>
+</div>
 
-  <div class="form-group">
-    <label>{{ form.rating.label }}</label>
-    <div class="rating-choices">
-      {% for value, label in form.rating.field.choices %}
-        <label>
-          <input type="radio" name="rating" value="{{ value }}"
-            {% if form.rating.value == value|stringformat:"s" %}checked{% endif %}>
-          {{ label }}
-        </label>
-      {% endfor %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+      <div class="rc-form-card">
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% for field in form %}
+          <div class="mb-3">
+            <label class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors|join:", " }}</div>{% endif %}
+            {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+          </div>
+          {% endfor %}
+          {% if form.non_field_errors %}<div class="alert alert-danger small">{{ form.non_field_errors|join:", " }}</div>{% endif %}
+          <button type="submit" class="btn btn-rc-accent w-100">
+            <i class="fa-solid fa-paper-plane me-1"></i>Отправить отзыв
+          </button>
+          <p class="text-muted small text-center mt-3 mb-0">
+            <i class="fa-solid fa-circle-info me-1"></i>Отзыв появится после проверки модератором.
+          </p>
+        </form>
+      </div>
     </div>
-    {% if form.rating.errors %}
-      <span class="form-error">{{ form.rating.errors }}</span>
-    {% endif %}
   </div>
+</div>
+{% endblock %}
 
-  <div class="form-group">
-    <label for="{{ form.text.id_for_label }}">{{ form.text.label }}</label>
-    {{ form.text }}
-    {% if form.text.errors %}
-      <span class="form-error">{{ form.text.errors }}</span>
-    {% endif %}
-  </div>
-
-  <button type="submit">Отправить</button>
-  <a href="{% url 'reviews:list' %}">Отмена</a>
-</form>
+{% block extra_js %}
+<script>
+  document.querySelectorAll('.rc-form-card input, .rc-form-card select, .rc-form-card textarea').forEach(el => {
+    el.classList.add(el.tagName === 'SELECT' ? 'form-select' : 'form-control');
+  });
+</script>
 {% endblock %}

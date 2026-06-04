@@ -1,30 +1,108 @@
 {% extends "base.html" %}
-
-{% block title %}Главная — RentCar{% endblock %}
+{% block title %}RentCar — Прокат автомобилей в Минске{% endblock %}
 
 {% block content %}
-<section class="hero">
-  <h1>Прокат автомобилей RentCar</h1>
-  <p>Широкий выбор автомобилей по доступным ценам. Быстрое оформление, прозрачные условия.</p>
-  <a href="{% url 'car_rental:car_list' %}">Выбрать автомобиль</a>
+<section class="rc-hero">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <h1 class="mb-3">Аренда автомобилей<br><span style="color:var(--rc-accent-light);">быстро и выгодно</span></h1>
+        <p class="lead mb-4">Широкий выбор автомобилей, прозрачные условия, минимум формальностей. Оформляйте прокат онлайн.</p>
+        <div class="d-flex gap-3 flex-wrap">
+          <a href="{% url 'car_rental:car_list' %}" class="btn btn-hero"><i class="fa-solid fa-car me-2"></i>Выбрать автомобиль</a>
+          {% if not user.is_authenticated %}
+            <a href="{% url 'users:register' %}" class="btn btn-hero-outline"><i class="fa-solid fa-user-plus me-2"></i>Регистрация</a>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-lg-5 d-none d-lg-flex justify-content-end">
+        <i class="fa-solid fa-car-side" style="font-size:9rem;opacity:.12;color:#fff;"></i>
+      </div>
+    </div>
+  </div>
 </section>
 
-{% if latest_article %}
-<section class="latest-news">
-  <h2>Последняя новость</h2>
-  <article>
-    {% if latest_article.image %}
-      <img src="{{ latest_article.image.url }}" alt="{{ latest_article.title }}">
-    {% endif %}
-    <h3>{{ latest_article.title }}</h3>
-    <p class="date">{{ latest_article.published_at|date:"d.m.Y" }}</p>
-    <p>{{ latest_article.summary }}</p>
-    <a href="{% url 'news:detail' latest_article.pk %}">Читать далее →</a>
-  </article>
-</section>
-{% else %}
-<section class="latest-news">
-  <p>Новостей пока нет. <a href="{% url 'pages:about' %}">Узнайте о нас</a>.</p>
-</section>
-{% endif %}
+<div class="container mt-5 pt-2">
+
+  {% if latest_article %}
+  <h2 class="section-title">Последняя новость</h2>
+  <div class="row g-4 mb-5">
+    <div class="col-lg-8">
+      <div class="rc-card news-card">
+        {% if latest_article.image %}
+          <img src="{{ latest_article.image.url }}" class="news-card__img" alt="{{ latest_article.title }}">
+        {% else %}
+          <div class="news-card__placeholder"><i class="fa-regular fa-newspaper"></i></div>
+        {% endif %}
+        <div class="card-body p-4">
+          <span class="badge mb-2" style="background:var(--rc-primary);border-radius:.4rem;">
+            <i class="fa-regular fa-calendar me-1"></i>{{ latest_article.published_at|date:"d.m.Y" }}
+          </span>
+          <h4 class="fw-bold mb-2">{{ latest_article.title }}</h4>
+          <p class="text-muted">{{ latest_article.summary }}</p>
+          <a href="{% url 'news:detail' latest_article.pk %}" class="btn btn-rc-primary">
+            Читать далее <i class="fa-solid fa-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="rc-card h-100 p-4 d-flex flex-column justify-content-center align-items-center text-center gap-3">
+        <i class="fa-solid fa-newspaper fa-3x" style="color:var(--rc-primary);opacity:.25;"></i>
+        <div><div class="fw-bold mb-1">Все новости</div><p class="text-muted small">Следите за акциями и событиями</p></div>
+        <a href="{% url 'news:list' %}" class="btn btn-rc-primary btn-sm w-100"><i class="fa-solid fa-list me-1"></i>Все новости</a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <h2 class="section-title">Почему выбирают нас</h2>
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#dbeafe;"><i class="fa-solid fa-shield-halved" style="color:var(--rc-primary);"></i></div>
+        <div class="fw-bold mb-1">Надёжность</div>
+        <p class="text-muted small mb-0">Все автомобили проходят регулярное техническое обслуживание</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fef3c7;"><i class="fa-solid fa-bolt" style="color:#d97706;"></i></div>
+        <div class="fw-bold mb-1">Быстрое оформление</div>
+        <p class="text-muted small mb-0">Онлайн-бронирование за несколько минут без лишних документов</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#dcfce7;"><i class="fa-solid fa-percent" style="color:#16a34a;"></i></div>
+        <div class="fw-bold mb-1">Скидки и акции</div>
+        <p class="text-muted small mb-0">Система лояльности и промокоды для постоянных клиентов</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <a href="{% url 'car_rental:car_list' %}" class="rc-card p-3 text-center d-block text-decoration-none">
+        <i class="fa-solid fa-car fa-2x mb-2" style="color:var(--rc-primary);"></i><div class="fw-semibold small">Каталог</div>
+      </a>
+    </div>
+    <div class="col-6 col-md-3">
+      <a href="{% url 'promos:list' %}" class="rc-card p-3 text-center d-block text-decoration-none">
+        <i class="fa-solid fa-tag fa-2x mb-2" style="color:var(--rc-accent);"></i><div class="fw-semibold small">Промокоды</div>
+      </a>
+    </div>
+    <div class="col-6 col-md-3">
+      <a href="{% url 'reviews:list' %}" class="rc-card p-3 text-center d-block text-decoration-none">
+        <i class="fa-solid fa-star fa-2x mb-2" style="color:#f59e0b;"></i><div class="fw-semibold small">Отзывы</div>
+      </a>
+    </div>
+    <div class="col-6 col-md-3">
+      <a href="{% url 'pages:contacts' %}" class="rc-card p-3 text-center d-block text-decoration-none">
+        <i class="fa-solid fa-phone fa-2x mb-2" style="color:#16a34a;"></i><div class="fw-semibold small">Контакты</div>
+      </a>
+    </div>
+  </div>
+
+</div>
 {% endblock %}

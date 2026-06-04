@@ -20,6 +20,15 @@ class RentCarForm(forms.ModelForm):
             self.fields['car'].widget = forms.HiddenInput()
         self.fields['discount'].required = False
         self.fields['discount'].empty_label = 'Без скидки'
+        # Bootstrap-классы
+        for name, field in self.fields.items():
+            widget = field.widget
+            if isinstance(widget, forms.HiddenInput):
+                continue
+            if isinstance(widget, forms.Select):
+                widget.attrs.setdefault('class', 'form-select')
+            else:
+                widget.attrs.setdefault('class', 'form-control')
 
     def clean_issue_date(self):
         date = self.cleaned_data['issue_date']

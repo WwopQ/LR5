@@ -1,52 +1,100 @@
 {% extends "base.html" %}
-
 {% block title %}{{ car.car_model }} — RentCar{% endblock %}
 
 {% block content %}
-<h1>{{ car.car_model }}</h1>
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb mb-1">
+      <li class="breadcrumb-item"><a href="{% url 'pages:home' %}">Главная</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'car_rental:car_list' %}">Автомобили</a></li>
+      <li class="breadcrumb-item active">{{ car.car_model }}</li>
+    </ol></nav>
+    <h1><i class="fa-solid fa-car me-2"></i>{{ car.car_model }}</h1>
+  </div>
+</div>
 
-<table class="car-detail-table">
-  <tr><th>Государственный номер</th><td>{{ car.license_plate }}</td></tr>
-  <tr><th>Марка</th><td>{{ car.car_model.brand }}</td></tr>
-  <tr><th>Модель</th><td>{{ car.car_model.model_name }}</td></tr>
-  <tr><th>Тип кузова</th><td>{{ car.car_model.body_type }}</td></tr>
-  <tr><th>Год выпуска</th><td>{{ car.year }}</td></tr>
-  <tr><th>Автопарк</th><td>{{ car.car_park.name }}, {{ car.car_park.address }}</td></tr>
-  <tr><th>Стоимость автомобиля</th><td>{{ car.car_value }} руб.</td></tr>
-  <tr><th>Суточная стоимость проката</th><td><strong>{{ car.daily_price }} руб./сут.</strong></td></tr>
-</table>
+<div class="container">
+  <div class="row g-4">
 
-{# ─── Курсы валют ─────────────────────────────────────────────────────── #}
-{% if rates %}
-  <section>
-    <h2>Стоимость суток проката в других валютах</h2>
-    <table>
-      <tr>
-        <td>USD</td>
-        <td>{{ car.daily_price|floatformat:2 }} BYN = {{ rates.USD }} × {{ car.daily_price|floatformat:2 }}</td>
-      </tr>
-      <tr>
-        <td>EUR</td>
-        <td>{{ rates.EUR }}</td>
-      </tr>
-      <tr>
-        <td>RUB</td>
-        <td>{{ rates.RUB }}</td>
-      </tr>
-    </table>
-    <small>Курс BYN к другим валютам (ExchangeRate API)</small>
-  </section>
-{% endif %}
+    <!-- Фото и кнопка аренды -->
+    <div class="col-lg-5">
+      <div class="rc-card overflow-hidden mb-3">
+        {% if car.photo %}
+          <img src="{{ car.photo.url }}" alt="{{ car.car_model }}"
+               style="width:100%;max-height:340px;object-fit:cover;">
+        {% else %}
+          <div class="car-card__placeholder" style="height:300px;">
+            <i class="fa-solid fa-car-side"></i>
+          </div>
+        {% endif %}
+      </div>
 
-<p>
-  {% if user.is_authenticated %}
-    <a href="{% url 'car_rental:rent_car' car.pk %}">Арендовать этот автомобиль</a>
-  {% else %}
-    <a href="{% url 'users:login' %}?next={% url 'car_rental:rent_car' car.pk %}">
-      Войдите, чтобы арендовать
-    </a>
-  {% endif %}
-  &nbsp;|&nbsp;
-  <a href="{% url 'car_rental:car_list' %}">← Все автомобили</a>
-</p>
+      <div class="rc-card p-4 text-center">
+        <div class="car-price mb-1" style="font-size:2rem;">{{ car.daily_price }} руб.</div>
+        <div class="text-muted small mb-3">за сутки проката</div>
+        {% if user.is_authenticated %}
+          <a href="{% url 'car_rental:rent_car' car.pk %}" class="btn btn-rc-accent w-100">
+            <i class="fa-solid fa-key me-1"></i>Арендовать этот автомобиль
+          </a>
+        {% else %}
+          <a href="{% url 'users:login' %}?next={% url 'car_rental:rent_car' car.pk %}"
+             class="btn btn-rc-primary w-100">
+            <i class="fa-solid fa-right-to-bracket me-1"></i>Войдите, чтобы арендовать
+          </a>
+        {% endif %}
+        <a href="{% url 'car_rental:car_list' %}" class="btn btn-outline-secondary btn-sm w-100 mt-2">
+          <i class="fa-solid fa-arrow-left me-1"></i>Все автомобили
+        </a>
+      </div>
+    </div>
+
+    <!-- Характеристики -->
+    <div class="col-lg-7">
+      <div class="rc-card p-4 mb-4">
+        <h4 class="fw-bold mb-3"><i class="fa-solid fa-list me-2" style="color:var(--rc-primary);"></i>Характеристики</h4>
+        <div class="rc-table-wrap">
+          <table class="table mb-0">
+            <tbody>
+              <tr><td class="text-muted" style="width:45%"><i class="fa-solid fa-hashtag me-2"></i>Госномер</td><td><strong>{{ car.license_plate }}</strong></td></tr>
+              <tr><td class="text-muted"><i class="fa-solid fa-car me-2"></i>Марка</td><td>{{ car.car_model.brand }}</td></tr>
+              <tr><td class="text-muted"><i class="fa-solid fa-car-side me-2"></i>Модель</td><td>{{ car.car_model.model_name }}</td></tr>
+              <tr><td class="text-muted"><i class="fa-solid fa-car-burst me-2"></i>Тип кузова</td><td>{{ car.car_model.body_type }}</td></tr>
+              <tr><td class="text-muted"><i class="fa-regular fa-calendar me-2"></i>Год выпуска</td><td>{{ car.year }}</td></tr>
+              <tr><td class="text-muted"><i class="fa-solid fa-location-dot me-2"></i>Автопарк</td><td>{{ car.car_park.name }}, {{ car.car_park.address }}</td></tr>
+              <tr><td class="text-muted"><i class="fa-solid fa-sack-dollar me-2"></i>Стоимость авто</td><td>{{ car.car_value }} руб.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {% if rates %}
+      <div class="rc-card p-4">
+        <h4 class="fw-bold mb-3"><i class="fa-solid fa-coins me-2" style="color:#f59e0b;"></i>Стоимость в других валютах</h4>
+        <p class="text-muted small mb-3">Курс BYN · ExchangeRate API · 1 BYN =</p>
+        <div class="row g-3">
+          <div class="col-4">
+            <div class="stat-card">
+              <div class="stat-value" style="font-size:1.3rem;">{{ rates.USD }}</div>
+              <div class="stat-label">USD</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="stat-card">
+              <div class="stat-value" style="font-size:1.3rem;">{{ rates.EUR }}</div>
+              <div class="stat-label">EUR</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="stat-card">
+              <div class="stat-value" style="font-size:1.3rem;">{{ rates.RUB }}</div>
+              <div class="stat-label">RUB</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
 {% endblock %}

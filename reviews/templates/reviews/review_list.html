@@ -1,50 +1,76 @@
 {% extends "base.html" %}
-
 {% block title %}Отзывы — RentCar{% endblock %}
 
 {% block content %}
-<h1>Отзывы клиентов</h1>
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb mb-1">
+      <li class="breadcrumb-item"><a href="{% url 'pages:home' %}">Главная</a></li>
+      <li class="breadcrumb-item active">Отзывы</li>
+    </ol></nav>
+    <h1><i class="fa-solid fa-star me-2"></i>Отзывы клиентов</h1>
+  </div>
+</div>
 
-<p>
-  {% if user.is_authenticated %}
-    <a href="{% url 'reviews:add' %}">Оставить отзыв</a>
-  {% else %}
-    <a href="{% url 'users:login' %}?next={% url 'reviews:add' %}">Войдите</a>, чтобы оставить отзыв.
-  {% endif %}
-</p>
-
-{% if reviews %}
-  <div class="review-list">
-    {% for review in reviews %}
-      <div class="review-card">
-        <div class="review-card__header">
-          <strong>{{ review.name }}</strong>
-          <span class="review-card__rating">
-            {% for i in "12345" %}
-              {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
-            {% endfor %}
-            ({{ review.rating }}/5)
-          </span>
-          <span class="review-card__date">{{ review.created_at|date:"d.m.Y" }}</span>
-        </div>
-        <p class="review-card__text">{{ review.text|linebreaks }}</p>
-      </div>
-    {% endfor %}
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <p class="text-muted mb-0">Реальные отзывы наших клиентов</p>
+    {% if user.is_authenticated %}
+      <a href="{% url 'reviews:add' %}" class="btn btn-rc-accent">
+        <i class="fa-solid fa-pen-to-square me-1"></i>Написать отзыв
+      </a>
+    {% else %}
+      <a href="{% url 'users:login' %}?next={% url 'reviews:add' %}" class="btn btn-outline-secondary">
+        <i class="fa-solid fa-right-to-bracket me-1"></i>Войдите, чтобы оставить отзыв
+      </a>
+    {% endif %}
   </div>
 
-  {% if is_paginated %}
-    <nav class="pagination">
-      {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}">← Назад</a>
-      {% endif %}
-      <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
-      {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}">Вперёд →</a>
-      {% endif %}
-    </nav>
-  {% endif %}
+  {% if reviews %}
+    <div class="row g-4">
+      {% for review in reviews %}
+      <div class="col-lg-4 col-md-6">
+        <div class="review-card">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="client-avatar" style="width:44px;height:44px;font-size:1.1rem;">{{ review.name|first }}</div>
+            <div>
+              <div class="fw-bold">{{ review.name }}</div>
+              <div class="text-muted small"><i class="fa-regular fa-calendar me-1"></i>{{ review.created_at|date:"d.m.Y" }}</div>
+            </div>
+          </div>
+          <div class="review-stars mb-2">
+            {% for i in "12345" %}
+              {% if forloop.counter <= review.rating %}
+                <i class="fa-solid fa-star"></i>
+              {% else %}
+                <i class="fa-regular fa-star empty"></i>
+              {% endif %}
+            {% endfor %}
+            <span class="text-muted small ms-1">{{ review.rating }}/5</span>
+          </div>
+          <p class="text-muted small mb-0">{{ review.text|truncatewords:30 }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
 
-{% else %}
-  <p>Отзывов пока нет. Будьте первым!</p>
-{% endif %}
+    {% if is_paginated %}
+    <nav class="mt-4 d-flex justify-content-center">
+      <ul class="pagination">
+        {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}"><i class="fa-solid fa-chevron-left"></i></a></li>{% endif %}
+        <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</a></li>
+        {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}"><i class="fa-solid fa-chevron-right"></i></a></li>{% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  {% else %}
+    <div class="rc-card p-5 text-center">
+      <i class="fa-solid fa-star fa-3x mb-3" style="color:#e2e8f0;"></i>
+      <p class="text-muted mb-3">Отзывов пока нет. Будьте первым!</p>
+      {% if user.is_authenticated %}
+        <a href="{% url 'reviews:add' %}" class="btn btn-rc-accent">Написать отзыв</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
 {% endblock %}

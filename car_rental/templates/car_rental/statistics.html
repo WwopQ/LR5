@@ -1,168 +1,178 @@
 {% extends "base.html" %}
-
 {% block title %}Статистика — RentCar{% endblock %}
 
-{% block extra_css %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-{% endblock %}
-
 {% block content %}
-<h1>Статистика и аналитика</h1>
+<div class="page-header">
+  <div class="container">
+    <h1><i class="fa-solid fa-chart-bar me-2"></i>Статистика и аналитика</h1>
+    <small>Данные по всем прокатам системы</small>
+  </div>
+</div>
+
+<div class="container">
 
 {% if stats.total_count == 0 %}
-  <p>Данных для статистики нет. Добавьте прокаты через <a href="{% url 'admin:index' %}">админ-панель</a>.</p>
+  <div class="rc-card p-5 text-center">
+    <i class="fa-solid fa-chart-bar fa-3x mb-3" style="color:#cbd5e1;"></i>
+    <p class="text-muted">Данных для статистики нет. <a href="{% url 'admin:index' %}">Добавьте прокаты</a>.</p>
+  </div>
 {% else %}
 
-{# ─── Общие показатели ────────────────────────────────────────────────── #}
-<section>
-  <h2>Общие показатели</h2>
-  <table class="stats-table">
-    <tr><th>Всего прокатов</th><td>{{ stats.total_count }}</td></tr>
-    <tr><th>Общая выручка</th><td>{{ stats.total_revenue }} руб.</td></tr>
-    <tr><th>Средняя сумма проката</th><td>{{ stats.avg_total }} руб.</td></tr>
-    <tr><th>Медиана суммы проката</th><td>{{ stats.median_sum }} руб.</td></tr>
-    <tr><th>Мода суммы проката</th><td>{{ stats.mode_sum }} руб.</td></tr>
-    <tr><th>Максимальный прокат</th><td>{{ stats.max_total }} руб.</td></tr>
-    <tr><th>Минимальный прокат</th><td>{{ stats.min_total }} руб.</td></tr>
-  </table>
-</section>
+  <!-- Ключевые метрики -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#dbeafe;"><i class="fa-solid fa-file-lines" style="color:var(--rc-primary);"></i></div>
+        <div class="stat-value">{{ stats.total_count }}</div>
+        <div class="stat-label">Всего прокатов</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#dcfce7;"><i class="fa-solid fa-sack-dollar" style="color:#16a34a;"></i></div>
+        <div class="stat-value" style="font-size:1.4rem;">{{ stats.total_revenue }} <small style="font-size:.75rem;">руб.</small></div>
+        <div class="stat-label">Общая выручка</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fef3c7;"><i class="fa-solid fa-calculator" style="color:#d97706;"></i></div>
+        <div class="stat-value" style="font-size:1.4rem;">{{ stats.avg_total }} <small style="font-size:.75rem;">руб.</small></div>
+        <div class="stat-label">Средний чек</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fce7f3;"><i class="fa-solid fa-users" style="color:#be185d;"></i></div>
+        <div class="stat-value">{{ stats.avg_age|default:"—" }}</div>
+        <div class="stat-label">Средний возраст</div>
+      </div>
+    </div>
+  </div>
 
-{# ─── Возраст клиентов ────────────────────────────────────────────────── #}
-<section>
-  <h2>Возраст клиентов</h2>
-  <table class="stats-table">
-    <tr><th>Средний возраст</th><td>{{ stats.avg_age }} лет</td></tr>
-    <tr><th>Медианный возраст</th><td>{{ stats.median_age }} лет</td></tr>
-  </table>
-</section>
+  <div class="row g-4 mb-4">
+    <!-- Детальная статистика -->
+    <div class="col-lg-5">
+      <div class="rc-card p-4 h-100">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-table me-2" style="color:var(--rc-primary);"></i>Детализация</h5>
+        <div class="rc-table-wrap">
+          <table class="table mb-0">
+            <tbody>
+              <tr><td class="text-muted">Медиана суммы</td><td class="fw-semibold">{{ stats.median_sum }} руб.</td></tr>
+              <tr><td class="text-muted">Мода суммы</td><td class="fw-semibold">{{ stats.mode_sum }} руб.</td></tr>
+              <tr><td class="text-muted">Максимальный прокат</td><td class="fw-semibold">{{ stats.max_total }} руб.</td></tr>
+              <tr><td class="text-muted">Минимальный прокат</td><td class="fw-semibold">{{ stats.min_total }} руб.</td></tr>
+              <tr><td class="text-muted">Медианный возраст</td><td class="fw-semibold">{{ stats.median_age }} лет</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
-{# ─── Популярные марки ────────────────────────────────────────────────── #}
-<section>
-  <h2>Популярные марки (по количеству прокатов)</h2>
-  <table class="stats-table">
-    <thead><tr><th>Марка</th><th>Количество прокатов</th></tr></thead>
-    <tbody>
-      {% for brand in stats.popular_brands %}
-        <tr>
-          <td>{{ brand.car__car_model__brand }}</td>
-          <td>{{ brand.count }}</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</section>
+    <!-- Популярные марки -->
+    <div class="col-lg-3">
+      <div class="rc-card p-4 h-100">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-car me-2" style="color:var(--rc-accent);"></i>Топ марок</h5>
+        {% for brand in stats.popular_brands %}
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="small">{{ brand.car__car_model__brand }}</span>
+          <span class="badge" style="background:var(--rc-primary);border-radius:.4rem;">{{ brand.count }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
 
-{# ─── Типы кузова ─────────────────────────────────────────────────────── #}
-<section>
-  <h2>Типы кузова</h2>
-  <table class="stats-table">
-    <thead><tr><th>Тип кузова</th><th>Прокатов</th><th>Выручка</th></tr></thead>
-    <tbody>
-      {% for bt in stats.popular_body_types %}
-        <tr>
-          <td>{{ bt.car__car_model__body_type__name }}</td>
-          <td>{{ bt.count }}</td>
-          <td>{{ bt.revenue }} руб.</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</section>
+    <!-- Типы кузова -->
+    <div class="col-lg-4">
+      <div class="rc-card p-4 h-100">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-car-side me-2" style="color:#16a34a;"></i>Типы кузова</h5>
+        <div class="rc-table-wrap">
+          <table class="table table-sm mb-0">
+            <thead><tr><th>Тип</th><th>Прокатов</th><th>Выручка</th></tr></thead>
+            <tbody>
+              {% for bt in stats.popular_body_types %}
+              <tr>
+                <td>{{ bt.car__car_model__body_type__name }}</td>
+                <td>{{ bt.count }}</td>
+                <td class="small">{{ bt.revenue }} р.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 
-{# ─── Клиенты по алфавиту ─────────────────────────────────────────────── #}
-<section>
-  <h2>Клиенты (по алфавиту)</h2>
-  <table class="stats-table">
-    <thead>
-      <tr><th>Клиент</th><th>Прокатов</th><th>Потрачено</th></tr>
-    </thead>
-    <tbody>
-      {% for client in stats.clients_alpha %}
-        <tr>
-          <td>{{ client.full_name }}</td>
-          <td>{{ client.rental_count }}</td>
-          <td>{{ client.total_spent|default:"0" }} руб.</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</section>
+  <!-- График matplotlib -->
+  <div class="rc-card p-4 mb-4">
+    <h5 class="fw-bold mb-1"><i class="fa-solid fa-chart-column me-2" style="color:var(--rc-primary);"></i>Выручка по месяцам</h5>
+    <p class="text-muted small mb-3"><i class="fa-brands fa-python me-1"></i>График сгенерирован средствами Python (matplotlib)</p>
+    <img src="{% url 'car_rental:statistics_chart' %}"
+         alt="График выручки по месяцам"
+         style="max-width:100%;height:auto;border-radius:.5rem;">
+  </div>
 
-{# ─── График выручки по месяцам ───────────────────────────────────────── #}
-{% if stats.chart_labels %}
-<section>
-  <h2>Выручка по месяцам</h2>
-  <canvas id="revenueChart" height="100"></canvas>
-</section>
+  <!-- Клиенты -->
+  <div class="rc-card p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="fw-bold mb-0"><i class="fa-solid fa-users me-2" style="color:var(--rc-primary);"></i>Клиенты</h5>
+      <a href="{% url 'car_rental:staff_clients' %}" class="btn btn-outline-secondary btn-sm">Подробнее →</a>
+    </div>
+    <div class="rc-table-wrap">
+      <table class="table mb-0">
+        <thead><tr><th>Клиент</th><th>Прокатов</th><th>Потрачено</th></tr></thead>
+        <tbody>
+          {% for client in stats.clients_alpha %}
+          <tr>
+            <td><a href="{% url 'car_rental:staff_client_detail' client.pk %}">{{ client.full_name }}</a></td>
+            <td>{{ client.rental_count }}</td>
+            <td class="fw-semibold">{{ client.total_spent|default:"0" }} руб.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
 {% endif %}
 
-{% endif %}{# end if stats.total_count #}
+<!-- Внешние API -->
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="rc-card p-4">
+      <h5 class="fw-bold mb-3"><i class="fa-solid fa-user-secret me-2" style="color:var(--rc-primary);"></i>RandomUser API</h5>
+      {% if random_user %}
+        <div class="d-flex align-items-center gap-3">
+          <img src="{{ random_user.picture }}" alt="Фото"
+               style="width:60px;height:60px;border-radius:50%;border:2px solid var(--rc-border);">
+          <div>
+            <div class="fw-bold">{{ random_user.name }}</div>
+            <div class="text-muted small">{{ random_user.email }}</div>
+            <div class="text-muted small"><i class="fa-solid fa-location-dot me-1"></i>{{ random_user.country }}</div>
+          </div>
+        </div>
+      {% else %}
+        <p class="text-muted small mb-0"><i class="fa-solid fa-triangle-exclamation me-1"></i>API недоступен.</p>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="rc-card p-4">
+      <h5 class="fw-bold mb-3"><i class="fa-solid fa-coins me-2" style="color:#f59e0b;"></i>Курсы валют (ExchangeRate API)</h5>
+      {% if rates %}
+        <p class="text-muted small mb-2">1 BYN =</p>
+        <div class="row g-2">
+          <div class="col-4"><div class="stat-card"><div class="stat-value" style="font-size:1.2rem;">{{ rates.USD }}</div><div class="stat-label">USD</div></div></div>
+          <div class="col-4"><div class="stat-card"><div class="stat-value" style="font-size:1.2rem;">{{ rates.EUR }}</div><div class="stat-label">EUR</div></div></div>
+          <div class="col-4"><div class="stat-card"><div class="stat-value" style="font-size:1.2rem;">{{ rates.RUB }}</div><div class="stat-label">RUB</div></div></div>
+        </div>
+      {% else %}
+        <p class="text-muted small mb-0"><i class="fa-solid fa-triangle-exclamation me-1"></i>API недоступен.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
 
-{# ─── Внешние API ─────────────────────────────────────────────────────── #}
-<section>
-  <h2>Данные из внешних сервисов</h2>
-
-  {% if random_user %}
-    <h3>Случайный пользователь (RandomUser API)</h3>
-    <p>
-      <img src="{{ random_user.picture }}" alt="Фото">
-      <strong>{{ random_user.name }}</strong> —
-      {{ random_user.email }},
-      {{ random_user.country }}
-    </p>
-  {% else %}
-    <p>RandomUser API недоступен.</p>
-  {% endif %}
-
-  {% if rates %}
-    <h3>Курсы валют к BYN (ExchangeRate API)</h3>
-    <table class="stats-table">
-      <tr><th>USD</th><td>{{ rates.USD }}</td></tr>
-      <tr><th>EUR</th><td>{{ rates.EUR }}</td></tr>
-      <tr><th>RUB</th><td>{{ rates.RUB }}</td></tr>
-    </table>
-  {% else %}
-    <p>ExchangeRate API недоступен.</p>
-  {% endif %}
-</section>
-
-{% endblock %}
-
-{% block extra_js %}
-{% if stats.chart_labels %}
-<script>
-  const ctx = document.getElementById('revenueChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: {{ stats.chart_labels|safe }},
-      datasets: [
-        {
-          label: 'Выручка (руб.)',
-          data: {{ stats.chart_revenue|safe }},
-          backgroundColor: 'rgba(54, 162, 235, 0.6)',
-          borderColor: 'rgba(54, 162, 235, 1)',
-          borderWidth: 1,
-          yAxisID: 'y',
-        },
-        {
-          label: 'Количество прокатов',
-          data: {{ stats.chart_counts|safe }},
-          type: 'line',
-          borderColor: 'rgba(255, 99, 132, 1)',
-          backgroundColor: 'rgba(255, 99, 132, 0.2)',
-          yAxisID: 'y1',
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y:  { type: 'linear', position: 'left',  title: { display: true, text: 'Выручка (руб.)' } },
-        y1: { type: 'linear', position: 'right', title: { display: true, text: 'Прокатов' }, grid: { drawOnChartArea: false } },
-      },
-    },
-  });
-</script>
-{% endif %}
+</div>
 {% endblock %}

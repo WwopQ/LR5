@@ -1,65 +1,82 @@
 {% extends "base.html" %}
-
 {% block title %}Промокоды и купоны — RentCar{% endblock %}
 
 {% block content %}
-<h1>Промокоды и купоны</h1>
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb mb-1">
+      <li class="breadcrumb-item"><a href="{% url 'pages:home' %}">Главная</a></li>
+      <li class="breadcrumb-item active">Промокоды</li>
+    </ol></nav>
+    <h1><i class="fa-solid fa-tag me-2"></i>Промокоды и купоны</h1>
+  </div>
+</div>
 
-{# ─── Действующие ──────────────────────────────────────────────────────── #}
-<section>
-  <h2>Действующие</h2>
+<div class="container">
 
   {% if active_promos %}
-    <table class="promo-table">
-      <thead>
-        <tr>
-          <th>Промокод</th>
-          <th>Скидка</th>
-          <th>Описание</th>
-          <th>Действует до</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for promo in active_promos %}
-          <tr>
-            <td><code>{{ promo.code }}</code></td>
-            <td>{{ promo.discount_pct }}%</td>
-            <td>{{ promo.description|default:"—" }}</td>
-            <td>{{ promo.valid_to|date:"d.m.Y" }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>Активных промокодов нет.</p>
+  <h2 class="section-title">Действующие</h2>
+  <div class="row g-4 mb-5">
+    {% for promo in active_promos %}
+    <div class="col-lg-4 col-md-6">
+      <div class="promo-card">
+        <div class="promo-header">
+          <div class="text-white small mb-2 opacity-75"><i class="fa-solid fa-tag me-1"></i>Промокод</div>
+          <div class="promo-code">{{ promo.code }}</div>
+          <div class="promo-discount mt-2">−{{ promo.discount_pct }}%</div>
+        </div>
+        <div class="card-body p-3">
+          {% if promo.description %}<p class="text-muted small mb-2">{{ promo.description }}</p>{% endif %}
+          <div class="d-flex justify-content-between align-items-center small text-muted">
+            <span><i class="fa-regular fa-calendar me-1"></i>{{ promo.valid_from|date:"d.m.Y" }}</span>
+            <span><i class="fa-regular fa-calendar-xmark me-1"></i>{{ promo.valid_to|date:"d.m.Y" }}</span>
+          </div>
+          <div class="mt-2 text-center">
+            <span class="badge" style="background:#dcfce7;color:#15803d;border-radius:.4rem;">
+              <i class="fa-solid fa-circle-check me-1"></i>Активен
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
   {% endif %}
-</section>
 
-{# ─── Архив ────────────────────────────────────────────────────────────── #}
-{% if archived_promos %}
-  <section>
-    <h2>Архив</h2>
-    <table class="promo-table promo-table--archived">
-      <thead>
-        <tr>
-          <th>Промокод</th>
-          <th>Скидка</th>
-          <th>Описание</th>
-          <th>Действовал до</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for promo in archived_promos %}
-          <tr>
-            <td><code>{{ promo.code }}</code></td>
-            <td>{{ promo.discount_pct }}%</td>
-            <td>{{ promo.description|default:"—" }}</td>
-            <td>{{ promo.valid_to|date:"d.m.Y" }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </section>
-{% endif %}
+  {% if archived_promos %}
+  <h2 class="section-title" style="color:var(--rc-muted);">Архив</h2>
+  <div class="row g-3 mb-4">
+    {% for promo in archived_promos %}
+    <div class="col-lg-4 col-md-6">
+      <div class="promo-card archived" style="opacity:.65;">
+        <div class="promo-header">
+          <div class="text-white small mb-2 opacity-75">Промокод</div>
+          <div class="promo-code">{{ promo.code }}</div>
+          <div class="promo-discount mt-2" style="background:#94a3b8;">−{{ promo.discount_pct }}%</div>
+        </div>
+        <div class="card-body p-3">
+          <div class="d-flex justify-content-between align-items-center small text-muted">
+            <span>{{ promo.valid_from|date:"d.m.Y" }}</span>
+            <span>{{ promo.valid_to|date:"d.m.Y" }}</span>
+          </div>
+          <div class="mt-2 text-center">
+            <span class="badge" style="background:#fee2e2;color:#b91c1c;border-radius:.4rem;">
+              <i class="fa-solid fa-circle-xmark me-1"></i>Истёк
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
 
+  {% if not active_promos and not archived_promos %}
+  <div class="rc-card p-5 text-center">
+    <i class="fa-solid fa-tag fa-3x mb-3" style="color:#e2e8f0;"></i>
+    <p class="text-muted">Промокодов пока нет. Следите за новостями!</p>
+  </div>
+  {% endif %}
+
+</div>
 {% endblock %}

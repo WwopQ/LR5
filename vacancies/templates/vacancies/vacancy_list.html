@@ -1,25 +1,47 @@
 {% extends "base.html" %}
-
 {% block title %}Вакансии — RentCar{% endblock %}
 
 {% block content %}
-<h1>Вакансии</h1>
-
-{% if vacancies %}
-  <div class="vacancy-list">
-    {% for vacancy in vacancies %}
-      <div class="vacancy-card">
-        <h2>{{ vacancy.title }}</h2>
-        <p class="vacancy-card__meta">
-          Опубликовано: {{ vacancy.created_at|date:"d.m.Y" }}
-        </p>
-        <div class="vacancy-card__description">
-          {{ vacancy.description|linebreaks }}
-        </div>
-      </div>
-    {% endfor %}
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb mb-1">
+      <li class="breadcrumb-item"><a href="{% url 'pages:home' %}">Главная</a></li>
+      <li class="breadcrumb-item active">Вакансии</li>
+    </ol></nav>
+    <h1><i class="fa-solid fa-briefcase me-2"></i>Вакансии</h1>
   </div>
-{% else %}
-  <p>Открытых вакансий нет. Следите за обновлениями.</p>
-{% endif %}
+</div>
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      {% if vacancies %}
+        {% for vacancy in vacancies %}
+        <div class="vacancy-card mb-3">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="fw-bold mb-0">
+              <i class="fa-solid fa-circle-dot me-2" style="color:var(--rc-primary);font-size:.6rem;vertical-align:middle;"></i>
+              {{ vacancy.title }}
+            </h5>
+            <span class="badge" style="background:#dcfce7;color:#15803d;border-radius:.4rem;">
+              <i class="fa-solid fa-circle me-1" style="font-size:.5rem;"></i>Открыта
+            </span>
+          </div>
+          <div class="text-muted small mb-2"><i class="fa-regular fa-calendar me-1"></i>{{ vacancy.created_at|date:"d.m.Y" }}</div>
+          <p class="text-muted mb-3">{{ vacancy.description }}</p>
+          <a href="{% url 'pages:contacts' %}" class="btn btn-rc-primary btn-sm">
+            <i class="fa-solid fa-paper-plane me-1"></i>Откликнуться
+          </a>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="rc-card p-5 text-center">
+          <i class="fa-solid fa-briefcase fa-3x mb-3" style="color:#cbd5e1;"></i>
+          <p class="text-muted">Открытых вакансий сейчас нет. Следите за обновлениями!</p>
+          <a href="{% url 'pages:contacts' %}" class="btn btn-rc-primary btn-sm">Связаться с нами</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
 {% endblock %}

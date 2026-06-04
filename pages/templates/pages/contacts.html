@@ -1,38 +1,57 @@
 {% extends "base.html" %}
-
 {% block title %}Контакты — RentCar{% endblock %}
 
 {% block content %}
-<h1>Контакты</h1>
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb mb-1">
+      <li class="breadcrumb-item"><a href="{% url 'pages:home' %}">Главная</a></li>
+      <li class="breadcrumb-item active">Контакты</li>
+    </ol></nav>
+    <h1><i class="fa-solid fa-phone me-2"></i>Контакты</h1>
+  </div>
+</div>
 
+<div class="container">
 {% if employees %}
-  <div class="employees">
+  <div class="row g-4">
     {% for emp in employees %}
-      <div class="employee-card">
+    <div class="col-lg-4 col-md-6">
+      <div class="rc-card p-4 h-100 text-center">
         {% if emp.photo %}
-          <img src="{{ emp.photo.url }}" alt="{{ emp.full_name }}">
+          <img src="{{ emp.photo.url }}" alt="{{ emp.full_name }}"
+               style="width:100px;height:100px;object-fit:cover;border-radius:50%;margin-bottom:1rem;border:3px solid var(--rc-border);">
         {% else %}
-          <div class="employee-card__no-photo">Фото отсутствует</div>
+          <div class="client-avatar mx-auto mb-3" style="width:80px;height:80px;font-size:2rem;">
+            {{ emp.first_name|first }}
+          </div>
         {% endif %}
-
-        <h3>{{ emp.full_name }}</h3>
-        <p class="position">{{ emp.position }}</p>
-
-        {% if emp.description %}
-          <p>{{ emp.description }}</p>
-        {% endif %}
-
+        <h5 class="fw-bold mb-1">{{ emp.full_name }}</h5>
+        <p class="text-muted small mb-2">
+          <span class="badge" style="background:var(--rc-bg);color:var(--rc-primary);border:1px solid var(--rc-primary);border-radius:.4rem;">
+            {{ emp.position }}
+          </span>
+        </p>
+        {% if emp.description %}<p class="small text-muted">{{ emp.description }}</p>{% endif %}
         {% if emp.phone %}
-          <p>Тел.: <a href="tel:{{ emp.phone }}">{{ emp.phone }}</a></p>
+          <div class="mt-2"><a href="tel:{{ emp.phone }}" class="text-decoration-none">
+            <i class="fa-solid fa-phone me-1" style="color:var(--rc-primary);"></i>{{ emp.phone }}
+          </a></div>
         {% endif %}
-
         {% if emp.email %}
-          <p>Email: <a href="mailto:{{ emp.email }}">{{ emp.email }}</a></p>
+          <div class="mt-1"><a href="mailto:{{ emp.email }}" class="text-decoration-none">
+            <i class="fa-solid fa-envelope me-1" style="color:var(--rc-primary);"></i>{{ emp.email }}
+          </a></div>
         {% endif %}
       </div>
+    </div>
     {% endfor %}
   </div>
 {% else %}
-  <p>Информация о сотрудниках ещё не добавлена.</p>
+  <div class="rc-card p-5 text-center">
+    <i class="fa-solid fa-users fa-3x mb-3" style="color:#cbd5e1;"></i>
+    <p class="text-muted">Информация о сотрудниках ещё не добавлена.</p>
+  </div>
 {% endif %}
+</div>
 {% endblock %}

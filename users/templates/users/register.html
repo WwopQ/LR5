@@ -1,33 +1,90 @@
 {% extends "base.html" %}
-
 {% block title %}Регистрация — RentCar{% endblock %}
 
 {% block content %}
-<h1>Регистрация</h1>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+      <div class="text-center mb-4">
+        <i class="fa-solid fa-user-plus fa-3x" style="color:var(--rc-primary);"></i>
+        <h2 class="fw-bold mt-2">Создать аккаунт</h2>
+        <p class="text-muted small">Зарегистрируйтесь для оформления проката</p>
+      </div>
+      <div class="rc-form-card">
+        <form method="post" action="" novalidate>
+          {% csrf_token %}
+          <div class="row g-3">
 
-<form method="post" novalidate>
-  {% csrf_token %}
+            <div class="col-12">
+              <label class="form-label"><i class="fa-solid fa-at me-1"></i>Логин *</label>
+              {{ form.username }}
+              {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors|join:", " }}</div>{% endif %}
+              <div class="form-text">{{ form.username.help_text }}</div>
+            </div>
 
-  {% if form.non_field_errors %}
-    <div class="form-errors">{{ form.non_field_errors }}</div>
-  {% endif %}
+            <div class="col-md-6">
+              <label class="form-label"><i class="fa-solid fa-user me-1"></i>Имя *</label>
+              {{ form.first_name }}
+              {% if form.first_name.errors %}<div class="text-danger small mt-1">{{ form.first_name.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fa-solid fa-user me-1"></i>Фамилия *</label>
+              {{ form.last_name }}
+              {% if form.last_name.errors %}<div class="text-danger small mt-1">{{ form.last_name.errors|join:", " }}</div>{% endif %}
+            </div>
 
-  {% for field in form %}
-    <div class="form-group">
-      <label for="{{ field.id_for_label }}">
-        {{ field.label }}{% if field.field.required %} <span class="required">*</span>{% endif %}
-      </label>
-      {{ field }}
-      {% if field.help_text %}
-        <small class="form-help">{{ field.help_text }}</small>
-      {% endif %}
-      {% if field.errors %}
-        <span class="form-error">{{ field.errors }}</span>
-      {% endif %}
+            <div class="col-12">
+              <label class="form-label"><i class="fa-solid fa-envelope me-1"></i>Email *</label>
+              {{ form.email }}
+              {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors|join:", " }}</div>{% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label"><i class="fa-solid fa-phone me-1"></i>Телефон *</label>
+              {{ form.phone }}
+              <div class="form-text">+375 (29) XXX-XX-XX</div>
+              {% if form.phone.errors %}<div class="text-danger small mt-1">{{ form.phone.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fa-regular fa-calendar me-1"></i>Дата рождения *</label>
+              {{ form.birth_date }}
+              <div class="form-text">Только 18+</div>
+              {% if form.birth_date.errors %}<div class="text-danger small mt-1">{{ form.birth_date.errors|join:", " }}</div>{% endif %}
+            </div>
+
+            <div class="col-12">
+              <label class="form-label"><i class="fa-solid fa-location-dot me-1"></i>Адрес</label>
+              {{ form.address }}
+              {% if form.address.errors %}<div class="text-danger small mt-1">{{ form.address.errors|join:", " }}</div>{% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label"><i class="fa-solid fa-lock me-1"></i>Пароль *</label>
+              {{ form.password1 }}
+              {% if form.password1.errors %}<div class="text-danger small mt-1">{{ form.password1.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fa-solid fa-lock me-1"></i>Повторите пароль *</label>
+              {{ form.password2 }}
+              {% if form.password2.errors %}<div class="text-danger small mt-1">{{ form.password2.errors|join:", " }}</div>{% endif %}
+            </div>
+
+          </div>
+
+          {% if form.non_field_errors %}
+          <div class="alert alert-danger mt-3 small">{{ form.non_field_errors|join:", " }}</div>
+          {% endif %}
+
+          <button type="submit" class="btn btn-rc-primary w-100 mt-4">
+            <i class="fa-solid fa-user-plus me-1"></i>Зарегистрироваться
+          </button>
+        </form>
+        <hr class="my-3">
+        <p class="text-center text-muted small mb-0">
+          Уже есть аккаунт? <a href="{% url 'users:login' %}" class="fw-semibold">Войти</a>
+        </p>
+      </div>
     </div>
-  {% endfor %}
-
-  <button type="submit">Зарегистрироваться</button>
-  <p>Уже есть аккаунт? <a href="{% url 'users:login' %}">Войти</a></p>
-</form>
+  </div>
+</div>
 {% endblock %}

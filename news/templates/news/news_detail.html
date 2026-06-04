@@ -1,34 +1,45 @@
 {% extends "base.html" %}
-
 {% block title %}{{ article.title }} — RentCar{% endblock %}
 
 {% block content %}
-<article class="article-detail">
-
-  <h1>{{ article.title }}</h1>
-
-  <p class="article-detail__meta">
-    Опубликовано: {{ article.published_at|date:"d.m.Y H:i" }}
-    {% if request.user.is_staff and not article.is_published %}
-      <strong style="color:red;">[Не опубликовано — видно только сотрудникам]</strong>
-    {% endif %}
-  </p>
-
-  {% if article.image %}
-    <figure>
-      <img src="{{ article.image.url }}" alt="{{ article.title }}">
-    </figure>
-  {% endif %}
-
-  <div class="article-detail__content">
-    {{ article.content|linebreaks }}
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb mb-1">
+      <li class="breadcrumb-item"><a href="{% url 'pages:home' %}">Главная</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'news:list' %}">Новости</a></li>
+      <li class="breadcrumb-item active">{{ article.title|truncatechars:40 }}</li>
+    </ol></nav>
+    <h1>{{ article.title }}</h1>
+    <small><i class="fa-regular fa-calendar me-1"></i>{{ article.published_at|date:"d.m.Y H:i" }}
+      {% if request.user.is_staff and not article.is_published %}
+        <span class="badge bg-danger ms-2">Не опубликовано</span>
+      {% endif %}
+    </small>
   </div>
+</div>
 
-  <p class="article-detail__updated">
-    Обновлено: {{ article.updated_at|date:"d.m.Y H:i" }}
-  </p>
-
-  <a href="{% url 'news:list' %}">← Все новости</a>
-
-</article>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      <div class="rc-card p-4">
+        {% if article.image %}
+        <figure class="mb-4">
+          <img src="{{ article.image.url }}" alt="{{ article.title }}"
+               style="width:100%;max-height:480px;object-fit:cover;border-radius:.6rem;">
+        </figure>
+        {% endif %}
+        <div style="line-height:1.85; font-size:1.02rem;">
+          {{ article.content|linebreaks }}
+        </div>
+        <hr class="my-3">
+        <small class="text-muted"><i class="fa-solid fa-pen me-1"></i>Обновлено: {{ article.updated_at|date:"d.m.Y H:i" }}</small>
+      </div>
+      <div class="mt-3">
+        <a href="{% url 'news:list' %}" class="btn btn-outline-secondary btn-sm">
+          <i class="fa-solid fa-arrow-left me-1"></i>Все новости
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

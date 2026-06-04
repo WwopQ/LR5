@@ -1,69 +1,118 @@
 {% extends "base.html" %}
-
 {% block title %}Оформить прокат — RentCar{% endblock %}
 
 {% block content %}
-<h1>Оформить прокат</h1>
-
-<h2>{{ car.car_model }} ({{ car.license_plate }})</h2>
-<p>Суточная стоимость: <strong>{{ car.daily_price }} руб.</strong></p>
-
-<form method="post" novalidate>
-  {% csrf_token %}
-
-  {% if form.non_field_errors %}
-    <div class="form-errors">{{ form.non_field_errors }}</div>
-  {% endif %}
-
-  {# Скрытое поле car #}
-  {{ form.car }}
-
-  <div class="form-group">
-    <label for="{{ form.issue_date.id_for_label }}">{{ form.issue_date.label }}</label>
-    {{ form.issue_date }}
-    {% if form.issue_date.errors %}
-      <span class="form-error">{{ form.issue_date.errors }}</span>
-    {% endif %}
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb mb-1">
+      <li class="breadcrumb-item"><a href="{% url 'car_rental:car_list' %}">Автомобили</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'car_rental:car_detail' car.pk %}">{{ car.car_model }}</a></li>
+      <li class="breadcrumb-item active">Оформить прокат</li>
+    </ol></nav>
+    <h1><i class="fa-solid fa-key me-2"></i>Оформить прокат</h1>
   </div>
+</div>
 
-  <div class="form-group">
-    <label for="{{ form.days_count.id_for_label }}">{{ form.days_count.label }}</label>
-    {{ form.days_count }}
-    {% if form.days_count.errors %}
-      <span class="form-error">{{ form.days_count.errors }}</span>
-    {% endif %}
+<div class="container">
+  <div class="row g-4 justify-content-center">
+
+    <!-- Инфо об авто -->
+    <div class="col-lg-4">
+      <div class="rc-card overflow-hidden">
+        {% if car.photo %}
+          <img src="{{ car.photo.url }}" alt="{{ car.car_model }}"
+               style="width:100%;height:200px;object-fit:cover;">
+        {% else %}
+          <div class="car-card__placeholder"><i class="fa-solid fa-car-side"></i></div>
+        {% endif %}
+        <div class="p-3">
+          <h5 class="fw-bold mb-2">{{ car.car_model }}</h5>
+          <div class="small text-muted mb-1"><i class="fa-solid fa-hashtag me-1"></i>{{ car.license_plate }}</div>
+          <div class="small text-muted mb-1"><i class="fa-regular fa-calendar me-1"></i>{{ car.year }} год</div>
+          <div class="small text-muted mb-3"><i class="fa-solid fa-location-dot me-1"></i>{{ car.car_park.name }}</div>
+          <div class="car-price">{{ car.daily_price }} руб. <small>/ сутки</small></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Форма -->
+    <div class="col-lg-5">
+      <div class="rc-form-card">
+        <h5 class="fw-bold mb-4"><i class="fa-solid fa-file-contract me-2" style="color:var(--rc-primary);"></i>Условия проката</h5>
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {{ form.car }}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger small">{{ form.non_field_errors|join:", " }}</div>
+          {% endif %}
+
+          <div class="mb-3">
+            <label class="form-label"><i class="fa-regular fa-calendar me-1"></i>{{ form.issue_date.label }} *</label>
+            {{ form.issue_date }}
+            {% if form.issue_date.errors %}<div class="text-danger small mt-1">{{ form.issue_date.errors|join:", " }}</div>{% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label"><i class="fa-solid fa-clock me-1"></i>{{ form.days_count.label }} *</label>
+            {{ form.days_count }}
+            {% if form.days_count.errors %}<div class="text-danger small mt-1">{{ form.days_count.errors|join:", " }}</div>{% endif %}
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label"><i class="fa-solid fa-percent me-1"></i>{{ form.discount.label }}</label>
+            {{ form.discount }}
+            {% if form.discount.errors %}<div class="text-danger small mt-1">{{ form.discount.errors|join:", " }}</div>{% endif %}
+          </div>
+
+          <!-- Предварительный расчёт -->
+          <div class="rc-card p-3 mb-4" id="pricePreviewBlock" style="display:none;background:#f0f9ff;border:1px solid #bae6fd;">
+            <div class="small text-muted mb-1">Предварительная стоимость</div>
+            <div id="pricePreview" class="fw-bold" style="font-size:1.3rem;color:var(--rc-primary);"></div>
+            <div class="small text-muted">без учёта скидок и штрафов</div>
+          </div>
+
+          <button type="submit" class="btn btn-rc-accent w-100">
+            <i class="fa-solid fa-check me-1"></i>Оформить прокат
+          </button>
+          <a href="{% url 'car_rental:car_detail' car.pk %}" class="btn btn-outline-secondary w-100 mt-2">
+            <i class="fa-solid fa-xmark me-1"></i>Отмена
+          </a>
+        </form>
+      </div>
+    </div>
+
   </div>
-
-  <div class="form-group">
-    <label for="{{ form.discount.id_for_label }}">{{ form.discount.label }}</label>
-    {{ form.discount }}
-    {% if form.discount.errors %}
-      <span class="form-error">{{ form.discount.errors }}</span>
-    {% endif %}
-  </div>
-
-  <p id="price-preview"></p>
-
-  <button type="submit">Оформить прокат</button>
-  <a href="{% url 'car_rental:car_detail' car.pk %}">Отмена</a>
-</form>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-  // Предварительный расчёт стоимости на стороне клиента
   const dailyPrice = {{ car.daily_price }};
   const daysInput = document.getElementById('{{ form.days_count.id_for_label }}');
-  const preview = document.getElementById('price-preview');
+  const previewBlock = document.getElementById('pricePreviewBlock');
+  const previewEl = document.getElementById('pricePreview');
 
   function updatePreview() {
     const days = parseInt(daysInput.value) || 0;
     if (days > 0) {
-      preview.textContent = 'Примерная стоимость: ' + (dailyPrice * days).toFixed(2) + ' руб. (без учёта скидок)';
+      previewBlock.style.display = '';
+      previewEl.textContent = (dailyPrice * days).toFixed(2) + ' руб.';
     } else {
-      preview.textContent = '';
+      previewBlock.style.display = 'none';
     }
   }
-  daysInput && daysInput.addEventListener('input', updatePreview);
+  if (daysInput) {
+    daysInput.addEventListener('input', updatePreview);
+    // Добавляем класс Bootstrap к полю
+    daysInput.classList.add('form-control');
+    updatePreview();
+  }
+  // Добавляем классы Bootstrap к остальным полям
+  document.querySelectorAll('.rc-form-card input, .rc-form-card select, .rc-form-card textarea').forEach(el => {
+    if (!el.type || el.type !== 'hidden') {
+      el.classList.add(el.tagName === 'SELECT' ? 'form-select' : 'form-control');
+    }
+  });
 </script>
 {% endblock %}

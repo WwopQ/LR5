@@ -1,23 +1,45 @@
 {% extends "base.html" %}
-
 {% block title %}Вопросы и ответы — RentCar{% endblock %}
 
 {% block content %}
-<h1>Вопросы и ответы</h1>
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb mb-1">
+      <li class="breadcrumb-item"><a href="{% url 'pages:home' %}">Главная</a></li>
+      <li class="breadcrumb-item active">Вопросы и ответы</li>
+    </ol></nav>
+    <h1><i class="fa-solid fa-circle-question me-2"></i>Часто задаваемые вопросы</h1>
+  </div>
+</div>
 
-{% if faqs %}
-  <dl class="faq-list">
-    {% for faq in faqs %}
-      <div class="faq-item">
-        <dt class="faq-item__question">{{ faq.question }}</dt>
-        <dd class="faq-item__answer">
-          {{ faq.answer|linebreaks }}
-          <span class="faq-item__date">Добавлено: {{ faq.date_added|date:"d.m.Y" }}</span>
-        </dd>
-      </div>
-    {% endfor %}
-  </dl>
-{% else %}
-  <p>Вопросов пока нет.</p>
-{% endif %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      {% if faqs %}
+        <div class="accordion" id="faqAccordion">
+          {% for faq in faqs %}
+          <div class="faq-item mb-2">
+            <div class="faq-question" data-bs-toggle="collapse"
+                 data-bs-target="#faq{{ faq.pk }}" aria-expanded="false">
+              <span><i class="fa-solid fa-circle-question me-2" style="color:var(--rc-primary);"></i>{{ faq.question }}</span>
+              <i class="fa-solid fa-chevron-down" style="font-size:.8rem;color:var(--rc-muted);transition:transform .25s;"></i>
+            </div>
+            <div id="faq{{ faq.pk }}" class="collapse">
+              <div class="faq-answer">
+                {{ faq.answer|linebreaks }}
+                <div class="mt-2"><small class="text-muted"><i class="fa-regular fa-calendar me-1"></i>Добавлено: {{ faq.date_added|date:"d.m.Y" }}</small></div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="rc-card p-5 text-center">
+          <i class="fa-solid fa-circle-question fa-3x mb-3" style="color:#cbd5e1;"></i>
+          <p class="text-muted">Вопросов пока нет.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
 {% endblock %}

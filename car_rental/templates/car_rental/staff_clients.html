@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Клиенты — Сотрудник{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <h1><i class="fa-solid fa-users me-2"></i>Список клиентов</h1>
+  </div>
+</div>
+
+<div class="container">
+  <div class="filter-panel">
+    <form method="get" action="" class="row g-2 align-items-end">
+      <div class="col-md-8">
+        <label class="form-label small fw-semibold mb-1"><i class="fa-solid fa-magnifying-glass me-1"></i>Поиск</label>
+        <input type="text" name="q" value="{{ q }}" class="form-control form-control-sm" placeholder="Фамилия, имя или телефон...">
+      </div>
+      <div class="col-md-4 d-flex gap-2">
+        <button type="submit" class="btn btn-rc-primary btn-sm flex-grow-1">Найти</button>
+        {% if q %}<a href="?" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-xmark"></i></a>{% endif %}
+      </div>
+    </form>
+  </div>
+
+  {% if clients %}
+  <div class="rc-table-wrap">
+    <table class="table mb-0">
+      <thead><tr><th>Клиент</th><th>Телефон</th><th>Прокатов</th><th>Потрачено</th><th></th></tr></thead>
+      <tbody>
+        {% for client in clients %}
+        <tr>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="client-avatar" style="width:36px;height:36px;font-size:.95rem;">{{ client.first_name|first }}</div>
+              <div>
+                <div class="fw-semibold">{{ client.full_name }}</div>
+                <div class="text-muted small">{{ client.address|default:"—" }}</div>
+              </div>
+            </div>
+          </td>
+          <td><a href="tel:{{ client.phone }}">{{ client.phone }}</a></td>
+          <td><span class="badge" style="background:var(--rc-primary);border-radius:.4rem;">{{ client.rental_count }}</span></td>
+          <td class="fw-semibold">{{ client.total_spent|default:"0" }} руб.</td>
+          <td><a href="{% url 'car_rental:staff_client_detail' client.pk %}" class="btn btn-outline-secondary btn-sm">Профиль →</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="rc-card p-5 text-center"><i class="fa-solid fa-users fa-3x mb-3" style="color:#cbd5e1;"></i><p class="text-muted">Клиентов не найдено.</p></div>
+  {% endif %}
+</div>
+{% endblock %}

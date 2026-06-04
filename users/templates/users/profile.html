@@ -1,48 +1,79 @@
 {% extends "base.html" %}
-
 {% block title %}Личный кабинет — RentCar{% endblock %}
 
 {% block content %}
-<h1>Личный кабинет</h1>
+<div class="page-header">
+  <div class="container">
+    <h1><i class="fa-regular fa-user me-2"></i>Личный кабинет</h1>
+    <small>{{ user.get_full_name|default:user.username }} · {{ user.email }}</small>
+  </div>
+</div>
 
-<p>
-  <strong>{{ user.get_full_name|default:user.username }}</strong>
-  &nbsp;|&nbsp; Возраст: {{ profile.age }} лет
-  &nbsp;|&nbsp; На сайте с: {{ user.date_joined|date:"d.m.Y" }}
-</p>
+<div class="container">
+  <div class="row g-4">
 
-<h2>Редактировать профиль</h2>
-
-<form method="post" novalidate>
-  {% csrf_token %}
-
-  {% if form.non_field_errors %}
-    <div class="form-errors">{{ form.non_field_errors }}</div>
-  {% endif %}
-
-  {% for field in form %}
-    <div class="form-group">
-      <label for="{{ field.id_for_label }}">
-        {{ field.label }}{% if field.field.required %} <span class="required">*</span>{% endif %}
-      </label>
-      {{ field }}
-      {% if field.help_text %}
-        <small class="form-help">{{ field.help_text }}</small>
-      {% endif %}
-      {% if field.errors %}
-        <span class="form-error">{{ field.errors }}</span>
-      {% endif %}
+    <!-- Форма профиля -->
+    <div class="col-lg-7">
+      <div class="rc-form-card">
+        <h5 class="fw-bold mb-4"><i class="fa-solid fa-pen-to-square me-2" style="color:var(--rc-primary);"></i>Редактировать профиль</h5>
+        <form method="post" action="" novalidate>
+          {% csrf_token %}
+          <div class="row g-3">
+            {% for field in form %}
+            <div class="col-{% if field.name == 'address' %}12{% else %}md-6 col-12{% endif %}">
+              <label class="form-label">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors|join:", " }}</div>{% endif %}
+              {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger mt-3 small">{{ form.non_field_errors|join:", " }}</div>
+          {% endif %}
+          <button type="submit" class="btn btn-rc-primary mt-4">
+            <i class="fa-solid fa-floppy-disk me-1"></i>Сохранить
+          </button>
+        </form>
+      </div>
     </div>
-  {% endfor %}
 
-  <button type="submit">Сохранить</button>
-</form>
+    <!-- Боковая панель -->
+    <div class="col-lg-5">
+      <div class="rc-card p-4 mb-3">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="client-avatar">{{ user.first_name|first|default:user.username|first }}</div>
+          <div>
+            <div class="fw-bold">{{ user.get_full_name|default:user.username }}</div>
+            <div class="text-muted small">{{ user.email }}</div>
+            {% if user.is_staff %}
+              <span class="badge mt-1" style="background:var(--rc-primary);border-radius:.4rem;">Сотрудник</span>
+            {% endif %}
+          </div>
+        </div>
+        <hr class="my-2">
+        <div class="small text-muted">
+          <div><i class="fa-solid fa-phone me-2"></i>{{ profile.phone|default:"Не указан" }}</div>
+          <div class="mt-1"><i class="fa-regular fa-calendar me-2"></i>{{ profile.birth_date|date:"d.m.Y" }} ({{ profile.age }} лет)</div>
+          {% if profile.address %}<div class="mt-1"><i class="fa-solid fa-location-dot me-2"></i>{{ profile.address }}</div>{% endif %}
+        </div>
+      </div>
+      <div class="rc-card p-4">
+        <h6 class="fw-bold mb-3">Быстрые ссылки</h6>
+        <div class="d-grid gap-2">
+          <a href="{% url 'car_rental:my_rentals' %}" class="btn btn-rc-primary btn-sm">
+            <i class="fa-solid fa-file-lines me-1"></i>Мои прокаты
+          </a>
+          <a href="{% url 'promos:list' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fa-solid fa-tag me-1"></i>Промокоды
+          </a>
+          <a href="{% url 'car_rental:car_list' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fa-solid fa-car me-1"></i>Выбрать автомобиль
+          </a>
+        </div>
+      </div>
+    </div>
 
-<hr>
-
-{# Кнопка выхода через POST (защита от CSRF) #}
-<form method="post" action="{% url 'users:logout' %}">
-  {% csrf_token %}
-  <button type="submit">Выйти из аккаунта</button>
-</form>
+  </div>
+</div>
 {% endblock %}

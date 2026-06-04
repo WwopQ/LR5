@@ -21,6 +21,7 @@ class RegistrationForm(UserCreationForm):
             'placeholder': 'Иван',
             'required': True,
             'minlength': '2',
+            'class': 'form-control',
         }),
     )
     last_name = forms.CharField(
@@ -85,10 +86,18 @@ class RegistrationForm(UserCreationForm):
         from dateutil.relativedelta import relativedelta
         max_date = date.today() - relativedelta(years=18)
         self.fields['birth_date'].widget.attrs['max'] = max_date.strftime('%Y-%m-%d')
-        # password поля тоже делаем required
         self.fields['password1'].widget.attrs['required'] = True
         self.fields['password2'].widget.attrs['required'] = True
         self.fields['username'].widget.attrs['required'] = True
+        # Bootstrap-классы для всех полей
+        for field in self.fields.values():
+            widget = field.widget
+            if isinstance(widget, (forms.TextInput, forms.EmailInput,
+                                   forms.NumberInput, forms.DateInput,
+                                   forms.PasswordInput, forms.Textarea)):
+                widget.attrs.setdefault('class', 'form-control')
+            elif isinstance(widget, forms.Select):
+                widget.attrs.setdefault('class', 'form-select')
 
     def clean_email(self):
         email = self.cleaned_data['email']
@@ -158,6 +167,14 @@ class ProfileForm(forms.ModelForm):
         # Упорядочиваем поля
         field_order = ['first_name', 'last_name', 'email', 'phone', 'birth_date', 'address']
         self.fields = {k: self.fields[k] for k in field_order if k in self.fields}
+        # Bootstrap-классы
+        for field in self.fields.values():
+            widget = field.widget
+            if isinstance(widget, (forms.TextInput, forms.EmailInput,
+                                   forms.DateInput, forms.Textarea)):
+                widget.attrs.setdefault('class', 'form-control')
+            elif isinstance(widget, forms.Select):
+                widget.attrs.setdefault('class', 'form-select')
 
     def clean_email(self):
         email = self.cleaned_data['email']

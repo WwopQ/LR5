@@ -1,53 +1,76 @@
 {% extends "base.html" %}
-
 {% block title %}Мои прокаты — RentCar{% endblock %}
 
 {% block content %}
-<h1>Мои прокаты</h1>
+<div class="page-header">
+  <div class="container">
+    <h1><i class="fa-solid fa-file-lines me-2"></i>Мои прокаты</h1>
+    <small>История ваших аренд</small>
+  </div>
+</div>
 
-{% if rentals %}
-  <table class="rentals-table">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Автомобиль</th>
-        <th>Дата выдачи</th>
-        <th>Дней</th>
-        <th>Возврат</th>
-        <th>Скидка</th>
-        <th>Сумма проката</th>
-        <th>Скидка (руб.)</th>
-        <th>Штрафы (руб.)</th>
-        <th>Итого</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for rental in rentals %}
-        <tr>
-          <td>{{ rental.pk }}</td>
-          <td>{{ rental.car.car_model }} ({{ rental.car.license_plate }})</td>
-          <td>{{ rental.issue_date|date:"d.m.Y" }}</td>
-          <td>{{ rental.days_count }}</td>
-          <td>{{ rental.expected_return_date|date:"d.m.Y" }}</td>
-          <td>{{ rental.discount|default:"—" }}</td>
-          <td>{{ rental.rental_sum }} руб.</td>
-          <td>{{ rental.discount_sum }} руб.</td>
-          <td>
-            {% if rental.fine_sum %}
-              <span style="color:red">{{ rental.fine_sum }} руб.</span>
-              <small>
-                ({% for fine in rental.fines.all %}{{ fine.name }}{% if not forloop.last %}, {% endif %}{% endfor %})
-              </small>
-            {% else %}
-              —
-            {% endif %}
-          </td>
-          <td><strong>{{ rental.total_sum }} руб.</strong></td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-{% else %}
-  <p>У вас пока нет прокатов. <a href="{% url 'car_rental:car_list' %}">Выбрать автомобиль</a></p>
-{% endif %}
+<div class="container">
+  <div class="row g-4">
+    <div class="col-lg-9">
+      {% if rentals %}
+        <div class="rc-table-wrap">
+          <table class="table mb-0">
+            <thead><tr>
+              <th>#</th><th>Автомобиль</th><th>Выдан</th><th>Дней</th>
+              <th>Возврат</th><th>Итого</th><th>Статус</th>
+            </tr></thead>
+            <tbody>
+              {% for rental in rentals %}
+              <tr>
+                <td class="text-muted small">{{ rental.pk }}</td>
+                <td>
+                  <div class="fw-semibold">{{ rental.car.car_model }}</div>
+                  <div class="text-muted small">{{ rental.car.license_plate }}</div>
+                </td>
+                <td>{{ rental.issue_date|date:"d.m.Y" }}</td>
+                <td>{{ rental.days_count }}</td>
+                <td>{{ rental.expected_return_date|date:"d.m.Y" }}</td>
+                <td>
+                  <div class="fw-bold">{{ rental.total_sum }} руб.</div>
+                  {% if rental.discount_sum %}<div class="text-muted small">скидка: −{{ rental.discount_sum }} руб.</div>{% endif %}
+                  {% if rental.fine_sum %}<div class="text-danger small">штраф: +{{ rental.fine_sum }} руб.</div>{% endif %}
+                </td>
+                <td>
+                  {% if rental.status == 'active' %}<span class="badge-status-active"><i class="fa-solid fa-circle-dot me-1"></i>{{ rental.get_status_display }}</span>
+                  {% elif rental.status == 'returned' %}<span class="badge-status-returned"><i class="fa-solid fa-circle-check me-1"></i>{{ rental.get_status_display }}</span>
+                  {% else %}<span class="badge-status-cancelled"><i class="fa-solid fa-circle-xmark me-1"></i>{{ rental.get_status_display }}</span>{% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="rc-card p-5 text-center">
+          <i class="fa-solid fa-car-side fa-3x mb-3" style="color:#cbd5e1;"></i>
+          <p class="text-muted mb-3">У вас пока нет прокатов.</p>
+          <a href="{% url 'car_rental:car_list' %}" class="btn btn-rc-primary">
+            <i class="fa-solid fa-car me-1"></i>Выбрать автомобиль
+          </a>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="col-lg-3">
+      <div class="rc-card p-4 mb-3">
+        <h6 class="fw-bold mb-3"><i class="fa-solid fa-tag me-1" style="color:var(--rc-accent);"></i>Промокоды</h6>
+        <p class="text-muted small">Используйте промокоды для получения скидки на следующий прокат.</p>
+        <a href="{% url 'promos:list' %}" class="btn btn-rc-accent btn-sm w-100">
+          Смотреть промокоды
+        </a>
+      </div>
+      <div class="rc-card p-4">
+        <h6 class="fw-bold mb-3"><i class="fa-solid fa-car me-1" style="color:var(--rc-primary);"></i>Новый прокат</h6>
+        <a href="{% url 'car_rental:car_list' %}" class="btn btn-rc-primary btn-sm w-100">
+          Выбрать автомобиль
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

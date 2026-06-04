@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}{{ client.full_name }} — Профиль клиента{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb mb-1">
+      <li class="breadcrumb-item"><a href="{% url 'car_rental:staff_clients' %}">Клиенты</a></li>
+      <li class="breadcrumb-item active">{{ client.full_name }}</li>
+    </ol></nav>
+    <h1><i class="fa-regular fa-user me-2"></i>{{ client.full_name }}</h1>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row g-4">
+
+    <div class="col-lg-4">
+      <div class="rc-card p-4 text-center mb-3">
+        <div class="client-avatar mx-auto mb-3" style="width:70px;height:70px;font-size:1.8rem;">{{ client.first_name|first }}</div>
+        <h5 class="fw-bold mb-1">{{ client.full_name }}</h5>
+        <div class="text-muted small mb-3">{{ client.user.username }} · {{ client.user.email|default:"—" }}</div>
+        <div class="rc-table-wrap">
+          <table class="table table-sm mb-0 text-start">
+            <tbody>
+              <tr><td class="text-muted"><i class="fa-solid fa-phone me-1"></i>Телефон</td><td>{{ client.phone }}</td></tr>
+              <tr><td class="text-muted"><i class="fa-solid fa-location-dot me-1"></i>Адрес</td><td>{{ client.address|default:"—" }}</td></tr>
+              <tr><td class="text-muted"><i class="fa-regular fa-calendar me-1"></i>Возраст</td><td>{{ client.age }} лет</td></tr>
+              <tr><td class="text-muted"><i class="fa-solid fa-file-lines me-1"></i>Прокатов</td><td>{{ rentals.count }}</td></tr>
+              <tr><td class="text-muted"><i class="fa-solid fa-sack-dollar me-1"></i>Потрачено</td><td class="fw-bold">{{ total_spent }} руб.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <a href="{% url 'car_rental:staff_clients' %}" class="btn btn-outline-secondary btn-sm w-100">
+        <i class="fa-solid fa-arrow-left me-1"></i>Все клиенты
+      </a>
+    </div>
+
+    <div class="col-lg-8">
+      <h5 class="fw-bold mb-3"><i class="fa-solid fa-clock-rotate-left me-2" style="color:var(--rc-primary);"></i>История прокатов</h5>
+      {% if rentals %}
+      <div class="rc-table-wrap">
+        <table class="table mb-0">
+          <thead><tr><th>#</th><th>Автомобиль</th><th>Выдан</th><th>Дней</th><th>Итого</th><th>Статус</th><th>Изменить</th></tr></thead>
+          <tbody>
+            {% for rental in rentals %}
+            <tr>
+              <td class="text-muted small">{{ rental.pk }}</td>
+              <td>
+                <div class="fw-semibold">{{ rental.car.car_model }}</div>
+                <div class="text-muted small">{{ rental.car.license_plate }}</div>
+              </td>
+              <td>{{ rental.issue_date|date:"d.m.Y" }}</td>
+              <td>{{ rental.days_count }}</td>
+              <td>
+                <div class="fw-bold">{{ rental.total_sum }} руб.</div>
+                {% if rental.fine_sum %}<div class="text-danger small">штраф: {{ rental.fine_sum }}</div>{% endif %}
+              </td>
+              <td>
+                {% if rental.status == 'active' %}<span class="badge-status-active">{{ rental.get_status_display }}</span>
+                {% elif rental.status == 'returned' %}<span class="badge-status-returned">{{ rental.get_status_display }}</span>
+                {% else %}<span class="badge-status-cancelled">{{ rental.get_status_display }}</span>{% endif %}
+              </td>
+              <td>
+                <form method="post" action="{% url 'car_rental:staff_rental_status' rental.pk %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                  <select name="status" class="form-select form-select-sm" style="min-width:120px;" onchange="this.form.submit()">
+                    {% for val, label in status_choices %}
+                      <option value="{{ val }}" {% if rental.status == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                  </select>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="rc-card p-4 text-center"><p class="text-muted mb-0">У клиента пока нет прокатов.</p></div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}
