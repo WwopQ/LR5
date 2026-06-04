@@ -17,6 +17,11 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'fallback-insecure-key-change-in-env')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost 127.0.0.1').split()
 
+# Render.com автоматически задаёт эту переменную
+RENDER_EXTERNAL_HOSTNAME = os.getenv('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
 # ─── Приложения ──────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
     # Django
@@ -43,6 +48,7 @@ INSTALLED_APPS = [
 # ─── Middleware ───────────────────────────────────────────────────────────────
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -122,6 +128,16 @@ STATICFILES_DIRS = [
 
 # Куда собирается статика командой collectstatic (для продакшена)
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# WhiteNoise — сжатие и кеширование статики
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 # ─── Медиафайлы (загружаемые пользователями) ─────────────────────────────────
 MEDIA_URL = '/media/'

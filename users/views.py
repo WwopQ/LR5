@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
 from .forms import RegistrationForm, ProfileForm
+from .models import Profile
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +71,10 @@ def profile(request):
     """Просмотр и редактирование профиля."""
     user = request.user
     # Получаем или создаём профиль (на случай если создан через админку без профиля)
-    profile_obj, _ = user.profile.__class__.objects.get_or_create(user=user)
+    profile_obj, _ = Profile.objects.get_or_create(
+        user=user,
+        defaults={'phone': '+375 (29) 000-00-00', 'birth_date': '2000-01-01'},
+    )
 
     if request.method == 'POST':
         form = ProfileForm(request.POST, instance=profile_obj, user=user)
