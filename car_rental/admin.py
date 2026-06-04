@@ -34,6 +34,9 @@ class CarAdmin(admin.ModelAdmin):
         ('Идентификация', {
             'fields': ('license_plate', 'car_model', 'year'),
         }),
+        ('Фото', {
+            'fields': ('photo',),
+        }),
         ('Размещение', {
             'fields': ('car_park',),
         }),
