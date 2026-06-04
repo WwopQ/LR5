@@ -1,0 +1,12 @@
+[
+  {"model": "promos.promocode", "pk": 1,  "fields": {"code": "WELCOME10",    "description": "Скидка для новых клиентов при первой аренде.",         "discount_pct": "10.00", "is_active": true,  "valid_from": "2026-01-01", "valid_to": "2026-12-31"}},
+  {"model": "promos.promocode", "pk": 2,  "fields": {"code": "SPRING2026",   "description": "Весенняя акция — аренда от 3 дней.",                   "discount_pct": "12.00", "is_active": true,  "valid_from": "2026-03-01", "valid_to": "2026-05-31"}},
+  {"model": "promos.promocode", "pk": 3,  "fields": {"code": "SUMMER2026",   "description": "Летний сезон — кроссоверы и минивэны.",                 "discount_pct": "15.00", "is_active": true,  "valid_from": "2026-06-01", "valid_to": "2026-08-31"}},
+  {"model": "promos.promocode", "pk": 4,  "fields": {"code": "HOTEL10",      "description": "Для гостей отелей-партнёров Minsk Hotel Group.",        "discount_pct": "10.00", "is_active": true,  "valid_from": "2026-01-01", "valid_to": "2026-12-31"}},
+  {"model": "promos.promocode", "pk": 5,  "fields": {"code": "LONGRENT15",   "description": "Аренда от 7 дней — увеличенная скидка.",               "discount_pct": "15.00", "is_active": true,  "valid_from": "2026-01-01", "valid_to": "2026-12-31"}},
+  {"model": "promos.promocode", "pk": 6,  "fields": {"code": "BIRTHDAY20",   "description": "Скидка в день рождения клиента.",                       "discount_pct": "20.00", "is_active": true,  "valid_from": "2026-01-01", "valid_to": "2026-12-31"}},
+  {"model": "promos.promocode", "pk": 7,  "fields": {"code": "NEWCAR2026",   "description": "Промокод на аренду новых поступлений парка.",           "discount_pct": "8.00",  "is_active": true,  "valid_from": "2026-05-01", "valid_to": "2026-07-31"}},
+  {"model": "promos.promocode", "pk": 8,  "fields": {"code": "WINTER2025",   "description": "Зимняя акция 2025 года (завершена).",                   "discount_pct": "10.00", "is_active": false, "valid_from": "2025-12-01", "valid_to": "2026-01-31"}},
+  {"model": "promos.promocode", "pk": 9,  "fields": {"code": "ELECTRIC10",   "description": "Скидка на аренду электромобилей.",                      "discount_pct": "10.00", "is_active": true,  "valid_from": "2026-06-01", "valid_to": "2026-12-31"}},
+  {"model": "promos.promocode", "pk": 10, "fields": {"code": "REFERRAL5",    "description": "Бонус за приглашение друга.",                           "discount_pct": "5.00",  "is_active": true,  "valid_from": "2026-01-01", "valid_to": "2026-12-31"}}
+]
