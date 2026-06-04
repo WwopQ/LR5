@@ -165,12 +165,12 @@ LOGGING = {
         },
     },
     'handlers': {
-        # Вывод в консоль PyCharm
+        # Вывод в консоль
         'console': {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
-        # Запись в файл
+        # Запись в файл — только локально (на Render диск временный)
         'file': {
             'class': 'logging.FileHandler',
             'filename': BASE_DIR / 'logs' / 'django.log',
@@ -178,24 +178,20 @@ LOGGING = {
             'encoding': 'utf-8',
         },
     },
-    'root': {
-        'handlers': ['console', 'file'],
-        'level': LOG_LEVEL,
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'file'],
-            'level': LOG_LEVEL,
-            'propagate': False,
-        },
-        # Логгеры для каждого приложения
-        'car_rental': {'handlers': ['console', 'file'], 'level': LOG_LEVEL, 'propagate': False},
-        'users':      {'handlers': ['console', 'file'], 'level': LOG_LEVEL, 'propagate': False},
-        'pages':      {'handlers': ['console', 'file'], 'level': LOG_LEVEL, 'propagate': False},
-        'news':       {'handlers': ['console', 'file'], 'level': LOG_LEVEL, 'propagate': False},
-        'faq':        {'handlers': ['console', 'file'], 'level': LOG_LEVEL, 'propagate': False},
-        'vacancies':  {'handlers': ['console', 'file'], 'level': LOG_LEVEL, 'propagate': False},
-        'reviews':    {'handlers': ['console', 'file'], 'level': LOG_LEVEL, 'propagate': False},
-        'promos':     {'handlers': ['console', 'file'], 'level': LOG_LEVEL, 'propagate': False},
-    },
+}
+
+# В продакшене (DATABASE_URL задан) — только консоль, файл не нужен
+_log_handlers = ['console'] if _DATABASE_URL else ['console', 'file']
+
+LOGGING['root'] = {'handlers': _log_handlers, 'level': LOG_LEVEL}
+LOGGING['loggers'] = {
+    'django':     {'handlers': _log_handlers, 'level': LOG_LEVEL, 'propagate': False},
+    'car_rental': {'handlers': _log_handlers, 'level': LOG_LEVEL, 'propagate': False},
+    'users':      {'handlers': _log_handlers, 'level': LOG_LEVEL, 'propagate': False},
+    'pages':      {'handlers': _log_handlers, 'level': LOG_LEVEL, 'propagate': False},
+    'news':       {'handlers': _log_handlers, 'level': LOG_LEVEL, 'propagate': False},
+    'faq':        {'handlers': _log_handlers, 'level': LOG_LEVEL, 'propagate': False},
+    'vacancies':  {'handlers': _log_handlers, 'level': LOG_LEVEL, 'propagate': False},
+    'reviews':    {'handlers': _log_handlers, 'level': LOG_LEVEL, 'propagate': False},
+    'promos':     {'handlers': _log_handlers, 'level': LOG_LEVEL, 'propagate': False},
 }
