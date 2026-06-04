@@ -1,7 +1,9 @@
 import logging
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView
 
@@ -49,3 +51,21 @@ class AddReviewView(LoginRequiredMixin, CreateView):
             'Спасибо за отзыв! Он появится на сайте после проверки модератором.',
         )
         return super().form_valid(form)
+
+
+@login_required(login_url='/users/login/')
+def review_delete(request, pk):
+    """Удаление отзыва — только для staff, только POST."""
+    if not request.user.is_staff:
+        messages.error(request, 'Недостаточно прав.')
+        return redirect('reviews:list')
+
+    review = get_object_or_404(Review, pk=pk)
+
+    if request.method == 'POST':
+        author = review.name
+        review.delete()
+        logger.info('Отзыв #%s (%s) удалён сотрудником %s', pk, author, request.user)
+        messages.success(request, f'Отзыв от «{author}» удалён.')
+
+    return redirect('reviews:list')

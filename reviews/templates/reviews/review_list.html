@@ -49,6 +49,15 @@
             <span class="text-muted small ms-1">{{ review.rating }}/5</span>
           </div>
           <p class="text-muted small mb-0">{{ review.text|truncatewords:30 }}</p>
+          {% if user.is_staff %}
+          <form method="post" action="{% url 'reviews:delete' review.pk %}" class="mt-2"
+                onsubmit="return confirm('Удалить отзыв от «{{ review.name }}»?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-danger">
+              <i class="fa-solid fa-trash me-1"></i>Удалить
+            </button>
+          </form>
+          {% endif %}
         </div>
       </div>
       {% endfor %}
